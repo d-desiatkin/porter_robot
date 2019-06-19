@@ -1,0 +1,17 @@
+<launch>
+
+	<!-- This needed due to bug in rviz visualization on melodic. When bug is fixed line below could be deleted -->
+	<env name="LC_NUMERIC" value="en_US.UTF-8" />
+
+	<arg name="model" default="$(find porter_robot)/model/model.xacro"/>
+	<arg name="gui" default="true" />
+	<arg name="rvizconfig" default="$(find porter_robot)/simulation/rviz/default.rviz" />
+
+	<param name="use_gui" value="$(arg gui)" />
+	<param name="robot_description" command="xacro $(arg model)" />
+
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>

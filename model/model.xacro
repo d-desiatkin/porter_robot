@@ -1,0 +1,416 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="porter">
+
+	<!-- Parameters of the chasiss -->
+	<xacro:property name="ch_length" value="0.9" />
+	<xacro:property name="ch_width" value="0.5" />
+	<xacro:property name="ch_thickness" value="0.05" />
+	<xacro:property name="ch_mass" value="15"/>
+	<xacro:property name="cbox_length" value="0.2" />
+	<xacro:property name="cbox_width" value="0.4" />
+	<xacro:property name="cbox_thickness" value="0.4" />
+	<xacro:property name="cbox_mass" value="3"/>
+	
+	<!-- Parameters of the chasiss -->
+	<xacro:property name="camera_link" value="0.05" />
+
+	<!-- Parameters of the actuated wheels -->
+	<xacro:property name="ac_wh_radius" value="0.127" />
+	<xacro:property name="ac_wh_thickness" value="0.048" />
+	<xacro:property name="ac_wh_mass" value="3"/>
+
+	<!-- Parameters of the free wheels -->
+	<xacro:property name="fr_wh_radius" value="0.049" />
+	<xacro:property name="fr_wh_thickness" value="0.024" />
+	<xacro:property name="fr_wh_mass" value="1"/>
+	<xacro:property name="main_holder_mass" value="0.3"/>
+	<xacro:property name="supp_holder_mass" value="0.6"/>
+	
+	<!-- Material block -->
+	<material name="blue">
+		<color rgba="0 0 0.8 1"/>
+	</material>
+ 
+	<material name="white">
+		<color rgba="1 1 1 1"/>
+	</material>
+
+	<material name="green">
+		<color rgba="0 0.8 0 1"/>
+	</material>
+
+	<!-- Some useful macroses -->
+	
+	<!-- Workpieces inertia -->
+	<xacro:macro name="wh_inertial" params="mass radius thickness">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="${1/12*mass*(3*radius*radius+thickness*thickness)}"
+				ixy="0.0" ixz="0.0"
+				iyy="${1/2*mass*radius*radius}" 
+				iyz="0.0"
+				izz="${1/12*mass*(3*radius*radius+thickness*thickness)}" />
+		</inertial>
+	</xacro:macro>
+	
+	<xacro:macro name="caster_wh_holder_main_inertial" params="mass cradius cthickness">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="${1/12*mass*(3*cradius*cradius+cthickness*cthickness)}"
+				ixy="0.0" ixz="0.0"
+				iyy="${1/12*mass*(3*cradius*cradius+cthickness*cthickness)}" 
+				iyz="0.0"
+				izz="${1/2*mass*cradius*cradius}" />
+		</inertial>
+	</xacro:macro>
+	
+	<xacro:macro name="caster_wh_holder_supp_inertial" params="mass length width thickness">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="${1/12*mass*(width*width+thickness*thickness)}"
+				ixy="0.0" ixz="0.0"
+				iyy="${1/12*mass*(length*length+thickness*thickness)}" 
+				iyz="0.0"
+				izz="${1/12*mass*(length*length+width*width)}" />
+		</inertial>
+	</xacro:macro>
+
+	<xacro:macro name="ch_inertial" params="mass length width thickness">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="${1/12*mass*(width*width+thickness*thickness)}"
+				ixy="0.0" ixz="0.0"
+				iyy="${1/12*mass*(length*length+thickness*thickness)}" 
+				iyz="0.0"
+				izz="${1/12*mass*(length*length+width*width)}" />
+		</inertial>
+	</xacro:macro>
+	
+	
+	<!-- Actuated wheel macros -->
+	<xacro:macro name="actuated_wheel" params="prefix *position">
+	<link name="${prefix}_actuated_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="${ac_wh_thickness}" radius="${ac_wh_radius}"/>
+			</geometry>
+			<origin rpy="1.57075 0 0" xyz="0 0 0"/>
+			<material name="green"/>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="${ac_wh_thickness}" radius="${ac_wh_radius}"/>
+			</geometry>
+			<origin rpy="1.57075 0 0" xyz="0 0 0"/>
+		</collision>
+		<xacro:wh_inertial mass="${ac_wh_mass}" radius="${ac_wh_radius}" thickness="${ac_wh_thickness}"/>
+	</link>
+ 
+	<joint name="chasiss_to_${prefix}_actuated_wheel" type="continuous">
+		<parent link="chasiss"/>
+		<child link="${prefix}_actuated_wheel"/>
+		<axis xyz="0 1 0"/>
+		<xacro:insert_block name="position" />
+	</joint>
+ 
+	<transmission name="${prefix}_actuated_wheel_trans">
+		<type>transmission_interface/SimpleTransmission</type>
+		<actuator name="${prefix}_actuated_wheel_motor">
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+		<joint name="chasiss_to_${prefix}_actuated_wheel">
+			<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+		</joint>
+	</transmission>
+	
+	<gazebo reference="${prefix}_actuated_wheel">
+		<fdir1>1 0 0</fdir1>
+		<mu1 value="200.0"/>
+		<mu2 value="100.0"/>
+		<kp value="10000000.0" />
+		<kd value="1.0" />
+		<material>Gazebo/Grey</material>
+	</gazebo>
+	</xacro:macro>
+	
+	
+	<!-- Free (caster) wheel macros -->
+	<xacro:macro name="free_wheel" params="prefix *position">
+	
+	<link name="${prefix}_free_wheel_holder_main">
+		<visual>
+			<geometry>
+				<cylinder length="0.01" radius="0.012"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="white"/>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="0.01" radius="0.012"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+		</collision>
+		<xacro:caster_wh_holder_main_inertial mass="${main_holder_mass}" cradius="0.012" cthickness="0.02"/>
+	</link>
+ 	
+ 	<joint name="chasiss_to_${prefix}_free_wheel_holder_main" type="continuous">
+		<parent link="chasiss"/>
+		<child link="${prefix}_free_wheel_holder_main"/>
+		<axis xyz="0 0 1"/>
+		<xacro:insert_block name="position" />
+	</joint>
+	
+	<transmission name="${prefix}_free_wheel_holder_main_trans">
+		<type>transmission_interface/SimpleTransmission</type>
+		<actuator name="${prefix}_free_wheel_holder_main_ax">
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+		<joint name="chasiss_to_${prefix}_free_wheel_holder_main">
+			<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+		</joint>
+	</transmission>
+	
+	<link name="${prefix}_free_wheel_holder_supp">
+		<visual>
+			<geometry>
+				<box size="0.104 0.002 0.06"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0.0148 0"/>
+			<material name="white"/>
+		</visual>
+		<visual>
+			<geometry>
+				<box size="0.104 0.002 0.06"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 -0.0148 0"/>
+			<material name="white"/>
+		</visual>
+		<!--<collision>
+			<geometry>
+				<box size="0.104 0.002 0.06"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0.0148 0"/>
+		</collision>
+		<collision>
+			<geometry>
+				<box size="0.104 0.002 0.06"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 -0.0148 0"/>
+		</collision>-->
+		<xacro:caster_wh_holder_supp_inertial mass="${supp_holder_mass}" length="0.104" width="0.004" thickness="0.06"/>
+	</link>
+	
+	<joint name="${prefix}_free_wheel_holder_main_to_supp" type="fixed">
+		<parent link="${prefix}_free_wheel_holder_main"/>
+		<child link="${prefix}_free_wheel_holder_supp"/>
+		<origin rpy="0 0 0" xyz="0.046 0.0 -0.03"/>
+	</joint>
+ 	
+	<link name="${prefix}_free_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="${fr_wh_thickness}" radius="${fr_wh_radius}"/>
+			</geometry>
+			<origin rpy="1.57075 0 0" xyz="0 0 0"/>
+			<material name="white"/>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="${fr_wh_thickness}" radius="${fr_wh_radius}"/>
+			</geometry>
+			<origin rpy="1.57075 0 0" xyz="0 0 0"/>
+		</collision>
+		<xacro:wh_inertial mass="${fr_wh_mass}" radius="${fr_wh_radius}" thickness="${fr_wh_thickness}"/>
+	</link>
+ 
+	<joint name="holder_to_${prefix}_free_wheel" type="continuous">
+		<parent link="${prefix}_free_wheel_holder_supp"/>
+		<child link="${prefix}_free_wheel"/>
+		<axis xyz="0 1 0"/>
+		<origin rpy="0 0 0" xyz="0 0 -0.026"/>
+	</joint>
+ 	
+	<transmission name="${prefix}_free_wheel_trans">
+		<type>transmission_interface/SimpleTransmission</type>
+		<actuator name="${prefix}_free_wheel_ax">
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+		<joint name="holder_to_${prefix}_free_wheel">
+			<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+		</joint>
+	</transmission>
+	
+	<gazebo reference="${prefix}_free_wheel_holder_main">
+		<mu1 value="200.0"/>
+		<mu2 value="100.0"/>
+		<kp value="2147483647.0" />
+		<kd value="1.0" />
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<gazebo reference="${prefix}_free_wheel_holder_supp">
+		<mu1 value="200.0"/>
+		<mu2 value="100.0"/>
+		<kp value="2147483647.0" />
+		<kd value="1.0" />
+		<material>Gazebo/White</material>
+	</gazebo>
+	
+	<gazebo reference="${prefix}_free_wheel">
+		<fdir1>1 0 0</fdir1>
+		<mu1 value="200.0"/>
+		<mu2 value="40.0"/>
+		<slip2 value="0.05"/>
+		<kp value="10000000.0" />
+		<kd value="1.0" />
+		<material>Gazebo/Grey</material>
+	</gazebo>
+	</xacro:macro>
+	<!-- End of macroses -->
+
+
+	<!-- Here actual model begins -->
+	<link name="chasiss">
+		<visual>
+			<geometry>
+				<box size="${ch_length} ${ch_width} ${ch_thickness}"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="blue"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="${ch_length} ${ch_width} ${ch_thickness}"/>
+			</geometry>
+		</collision>
+		<xacro:ch_inertial mass="${ch_mass}" length="${ch_length}" width="${ch_width}" thickness="${ch_thickness}"/>
+	</link>
+	
+	<gazebo reference="chasiss">
+		<mu1 value="200.0"/>
+		<mu2 value="100.0"/>
+		<kp value="2147483647.0" />
+		<kd value="1.0" />
+		<material>Gazebo/White</material>
+	</gazebo>
+ 	
+ 	<link name="control_box">
+		<visual>
+			<geometry>
+				<box size="${cbox_length} ${cbox_width} ${cbox_thickness}"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="blue"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="${cbox_length} ${cbox_width} ${cbox_thickness}"/>
+			</geometry>
+		</collision>
+		<xacro:ch_inertial mass="${cbox_mass}" length="${cbox_length}" width="${cbox_width}" thickness="${cbox_thickness}"/>
+	</link>
+	
+	<joint name="chasiss_to_control_box" type="fixed">
+		<parent link="chasiss"/>
+		<child link="control_box"/>
+		<origin rpy="0 0 0" xyz="0.4 0.0 ${(cbox_thickness/2+ch_thickness/2)}"/>
+	</joint>
+ 	
+	<xacro:actuated_wheel prefix="right">
+		<origin xyz="0.4 -0.270 -0.01"/>
+	</xacro:actuated_wheel>
+
+
+	<xacro:actuated_wheel prefix="left">
+		<origin xyz="0.4 0.270 -0.01"/>
+	</xacro:actuated_wheel>
+	
+	
+	<xacro:free_wheel prefix="right">
+		<origin xyz="-0.4 -0.25 -0.038"/>
+	</xacro:free_wheel>
+
+
+	<xacro:free_wheel prefix="left">
+		<origin xyz="-0.4 0.25 -0.038"/>
+	</xacro:free_wheel>
+	
+	<joint name="camera_joint" type="fixed">
+		<axis xyz="0 0 0" />
+		<origin xyz="${camera_link} 0 ${cbox_thickness/2 + camera_link/2}" rpy="0 0 0"/>
+		<parent link="control_box"/>
+		<child link="camera_main"/>
+	</joint>
+
+  <!-- Camera -->
+	<link name="camera_main">
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="${camera_link} ${camera_link} ${camera_link}"/>
+			</geometry>
+		</collision>
+
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="${camera_link} ${camera_link} ${camera_link}"/>
+			</geometry>
+			<material name="red"/>
+		</visual>
+
+		<inertial>
+			<mass value="1e-5" />
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+		</inertial>
+	</link>
+ 	
+	<gazebo reference="camera_main">
+	<sensor type="camera" name="camera_main">
+		<update_rate>30.0</update_rate>
+		<camera name="head">
+		<horizontal_fov>1.3962634</horizontal_fov>
+		<image>
+			<width>800</width>
+			<height>800</height>
+			<format>R8G8B8</format>
+		</image>
+		<clip>
+			<near>0.02</near>
+			<far>300</far>
+		</clip>
+		<noise>
+			<type>gaussian</type>
+			<!-- Noise is sampled independently per pixel on each frame.
+			That pixel's noise value is added to each of its color
+			channels, which at that point lie in the range [0,1]. -->
+			<mean>0.0</mean>
+			<stddev>0.007</stddev>
+		</noise>
+		</camera>
+		<plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+		<alwaysOn>true</alwaysOn>
+		<updateRate>0.0</updateRate>
+		<cameraName>porter/camera_main</cameraName>
+		<imageTopicName>image_raw</imageTopicName>
+		<cameraInfoTopicName>camera_info</cameraInfoTopicName>
+		<frameName>camera_main</frameName>
+		<hackBaseline>0.07</hackBaseline>
+		<distortionK1>0.0</distortionK1>
+		<distortionK2>0.0</distortionK2>
+		<distortionK3>0.0</distortionK3>
+		<distortionT1>0.0</distortionT1>
+		<distortionT2>0.0</distortionT2>
+		</plugin>
+	</sensor>
+	</gazebo>
+ 	
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>/</robotNamespace>
+		</plugin>
+	</gazebo>
+	
+</robot>
