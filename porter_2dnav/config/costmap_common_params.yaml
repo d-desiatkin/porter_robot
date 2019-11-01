@@ -1,0 +1,11 @@
+obstacle_range: 4.5
+raytrace_range: 6.0
+footprint: [[0.35, 0.35], [0.35, -0.35], [-0.35, -0.35], [-0.35, 0.35]]
+#robot_radius: ir_of_robot
+#inflation_radius: 1.00
+
+observation_sources: laser_scan_sensor # point_cloud_sensor  
+
+laser_scan_sensor: {sensor_frame: os1_lidar, data_type: LaserScan, topic: porter/os1_cloud_node/scan, marking: true, clearing: true}
+
+# point_cloud_sensor: {sensor_frame: os1_sensor, data_type: PointCloud2, topic: porter/os1_cloud_node/points, marking: true, clearing: true}

@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="porter">
+<!-- Some useful macroses -->
+	
+	<!-- Workpieces inertia -->
+	<xacro:macro name="ac_wh_inertial" params="mass radius thickness">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="${1/12*mass*(3*radius*radius+thickness*thickness)}"
+				ixy="0.0" ixz="0.0"
+				iyy="${1/2*mass*radius*radius}" 
+				iyz="0.0"
+				izz="${1/12*mass*(3*radius*radius+thickness*thickness)}" />
+		</inertial>
+	</xacro:macro>
+	
+	<xacro:macro name="fr_wh_inertial" params="mass radius">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="${2/5*mass*radius*radius}"
+				ixy="0.0" ixz="0.0"
+				iyy="${2/5*mass*radius*radius}" 
+				iyz="0.0"
+				izz="${2/5*mass*radius*radius}" />
+		</inertial>
+	</xacro:macro>
+
+	<xacro:macro name="ch_inertial" params="mass length width thickness">
+		<inertial>
+			<mass value="${mass}" />
+			<inertia ixx="${1/12*mass*(width*width+thickness*thickness)}"
+				ixy="0.0" ixz="0.0"
+				iyy="${1/12*mass*(length*length+thickness*thickness)}" 
+				iyz="0.0"
+				izz="${1/12*mass*(length*length+width*width)}" />
+		</inertial>
+	</xacro:macro>
+	
+	
+	<!-- Actuated wheel macros -->
+	<xacro:macro name="actuated_wheel" params="prefix *position">
+	<link name="${prefix}_actuated_wheel">
+		<visual>
+			<geometry>
+				<cylinder length="${ac_wh_thickness}" radius="${ac_wh_radius}"/>
+			</geometry>
+			<origin rpy="1.57075 0 0" xyz="0 0 0"/>
+			<material name="green"/>
+		</visual>
+		<collision>
+			<geometry>
+				<cylinder length="${ac_wh_thickness}" radius="${ac_wh_radius}"/>
+			</geometry>
+			<origin rpy="1.57075 0 0" xyz="0 0 0"/>
+		</collision>
+		<xacro:ac_wh_inertial mass="${ac_wh_mass}" radius="${ac_wh_radius}" thickness="${ac_wh_thickness}"/>
+	</link>
+ 
+	<joint name="${base_name}_to_${prefix}_actuated_wheel" type="continuous">
+		<parent link="${base_name}"/>
+		<child link="${prefix}_actuated_wheel"/>
+		<axis xyz="0 1 0"/>
+		<xacro:insert_block name="position" />
+	</joint>
+ 
+	<transmission name="${prefix}_actuated_wheel_trans">
+		<type>transmission_interface/SimpleTransmission</type>
+		<actuator name="${prefix}_actuated_wheel_motor">
+			<mechanicalReduction>1</mechanicalReduction>
+		</actuator>
+		<joint name="${base_name}_to_${prefix}_actuated_wheel">
+			<hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+		</joint>
+	</transmission>
+	
+	<gazebo reference="${prefix}_actuated_wheel">
+		<mu1 value="200.0"/>
+		<mu2 value="200.0"/>
+		<material>Gazebo/Grey</material>
+	</gazebo>
+	</xacro:macro>
+	
+	
+	<!-- Free (caster) wheel macros -->
+	<xacro:macro name="free_wheel" params="prefix *position">
+ 	
+	<link name="${prefix}_free_wheel">
+		<visual>
+			<geometry>
+				<sphere radius="${fr_wh_radius}"/>
+			</geometry>
+			<origin rpy="1.57075 0 0" xyz="0 0 0"/>
+			<material name="white"/>
+		</visual>
+		<collision>
+			<geometry>
+				<sphere radius="${fr_wh_radius}"/>
+			</geometry>
+			<origin rpy="1.57075 0 0" xyz="0 0 0"/>
+		</collision>
+		<xacro:fr_wh_inertial mass="${fr_wh_mass}" radius="${fr_wh_radius}"/>
+	</link>
+ 
+	<joint name="${base_name}_to_${prefix}_free_wheel" type="fixed">
+		<parent link="${base_name}"/>
+		<child link="${prefix}_free_wheel"/>
+		<xacro:insert_block name="position" />
+	</joint>
+	
+	<gazebo reference="${prefix}_free_wheel">
+		<mu1 value="0"/>
+		<mu2 value="0"/>
+		<material>Gazebo/Grey</material>
+	</gazebo>
+	</xacro:macro>
+	<!-- End of macroses -->
+</robot>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="porter">
+    
+    <gazebo reference="${base_name}">
+		<mu1 value="200.0"/>
+		<mu2 value="100.0"/>
+		<kp value="2147483647.0" />
+		<kd value="1.0" />
+		<material>Gazebo/White</material>
+	</gazebo>
+    
+    <gazebo>
+    
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>/</robotNamespace>
+		</plugin>
+		
+        <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so" >
+            <commandTopic>${command_topic_name}</commandTopic>
+            <odometryTopic>${odometry_topic_name}</odometryTopic>
+            <odometryFrame>${odometry_topic_name}</odometryFrame>
+            <robotBaseFrame>${base_name}</robotBaseFrame>
+            <publishWheelTF>true</publishWheelTF>
+            <publishWheelJointState>true</publishWheelJointState>
+            <legacyMode>false</legacyMode>
+            <wheelSeparation>${ac_wh_distance}</wheelSeparation>
+            <wheelDiameter>${ac_wh_radius*2}</wheelDiameter>
+            <wheelAcceleration>${wheel_acceleration_gazebo}</wheelAcceleration>
+            <wheelTorque>${wheel_torque_gazebo}</wheelTorque>
+            <updateRate>${update_rate_gazebo}</updateRate>
+            <leftJoint>${left_wheel_joint_name}</leftJoint>
+            <rightJoint>${right_wheel_joint_name}</rightJoint>
+            <publishTf>1</publishTf>
+        </plugin>
+    </gazebo>
+    
+</robot>

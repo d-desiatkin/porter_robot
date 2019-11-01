@@ -1,0 +1,34 @@
+<launch>
+	
+	<arg name="scan_topic" value="/porter/os1_cloud_node/scan" />
+	
+	<node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="porter_lidar_converter" >
+	<remap from="cloud_in" to="/porter/os1_cloud_node/points" />
+	<remap from="/scan" to="$(arg scan_topic)" />
+	</node>
+	
+	<param name="use_sim_time" value="true"/>
+	
+	<master auto="start"/>
+	
+	<!-- Run the map server -->
+	<node name="map_server" pkg="map_server" type="map_server" args="$(find porter_map)/small_town.yaml"/>
+	
+
+	<!--- Run AMCL --> 
+	<node pkg="amcl" type="amcl" name="amcl" output="screen">
+		<remap from="/scan" to="$(arg scan_topic)" />
+		<param name="base_frame_id" value="chasiss" />
+		<param name="odom_model_type" value="diff" /> 
+	</node>
+
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		<rosparam file="$(find porter_2dnav)/config/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+		<rosparam file="$(find porter_2dnav)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		<rosparam file="$(find porter_2dnav)/config/local_costmap_params.yaml" command="load" />
+		<rosparam file="$(find porter_2dnav)/config/global_costmap_params.yaml" command="load" /> 
+		<rosparam file="$(find porter_2dnav)/config/base_local_planner_params.yaml" command="load" />
+		<remap from="/cmd_vel" to="/porter/diff_drive_controller/cmd_vel" />
+	</node>
+
+</launch> 

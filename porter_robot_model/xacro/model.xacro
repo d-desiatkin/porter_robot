@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="porter">
+	<xacro:include filename="$(find porter_robot_model)/xacro/parameters.xacro"/>
+	<xacro:include filename="$(find porter_robot_model)/xacro/macroses.xacro"/>
+	<xacro:include filename="$(find porter_robot_model)/xacro/gazebo_ref.xacro"/>
+	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/camera_main.xacro"/>
+	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/OS1-64.urdf.xacro"/>
+
+	<!-- Here actual model begins -->
+	<link name="${base_name}">
+		<visual>
+			<geometry>
+				<box size="${base_length} ${base_width} ${base_thickness}"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="blue"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="${base_length} ${base_width} ${base_thickness}"/>
+			</geometry>
+		</collision>
+		<xacro:ch_inertial mass="${base_mass}" length="${base_length}" width="${base_width}" thickness="${base_thickness}"/>
+	</link>
+	
+
+ 	
+ 	<link name="control_box">
+		<visual>
+			<geometry>
+				<box size="${cbox_length} ${cbox_width} ${cbox_height}"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="blue"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="${cbox_length} ${cbox_width} ${cbox_height}"/>
+			</geometry>
+		</collision>
+		<xacro:ch_inertial mass="${cbox_mass}" length="${cbox_length}" width="${cbox_width}" thickness="${cbox_height}"/>
+	</link>
+	
+	<joint name="${base_name}_to_control_box" type="fixed">
+		<parent link="${base_name}"/>
+		<child link="control_box"/>
+		<origin rpy="0 0 0" xyz="0.0 0.0 ${(cbox_height/2+base_thickness/2)}"/>
+	</joint>
+ 	
+	<xacro:actuated_wheel prefix="right">
+		<origin xyz="${ac_wh_posx} ${-(ac_wh_posy)} ${ac_wh_posz}"/>
+	</xacro:actuated_wheel>
+
+
+	<xacro:actuated_wheel prefix="left">
+		<origin xyz="${ac_wh_posx} ${(ac_wh_posy)} ${ac_wh_posz}"/>
+	</xacro:actuated_wheel>
+	
+	
+	<xacro:free_wheel prefix="right">
+		<origin xyz="-0.4 ${-(fr_wh_distance/2)} ${-(ac_wh_radius-fr_wh_radius)}"/>
+	</xacro:free_wheel>
+
+
+	<xacro:free_wheel prefix="left">
+		<origin xyz="-0.4 ${(fr_wh_distance/2)} ${-(ac_wh_radius-fr_wh_radius)}"/>
+	</xacro:free_wheel>
+	
+</robot>

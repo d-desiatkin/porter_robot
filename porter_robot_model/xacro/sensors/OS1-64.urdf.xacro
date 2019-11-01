@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="os1_sensor">
+
+  
+  <!-- <xacro:macro name="OS1-64" params=" name:=  hz:=10 lasers:=64 samples:=512 min_range:=0.9 max_range:=75.0 noise:=0.008 min_angle:=-${M_PI} max_angle:=${M_PI}"> -->
+
+    <joint name="mount_joint" type="fixed">
+      <origin xyz="${lidar_posx} ${lidar_posy} ${cbox_height/2 + 0.073/2 + lidar_posz}" rpy="0 0 0"/>
+      <parent link="control_box"/>
+      <child link="os1_sensor"/>
+    </joint>
+
+    <link name="os1_sensor">
+      <inertial>
+         <mass value="0.33"/>
+         <origin xyz="0 0 0.0365" rpy="0 0 0" />
+         <inertia ixx="0.000241148" ixy="0" ixz="0"
+          iyy="0.000241148" iyz="0" izz="0.000264"/>
+      </inertial>
+      <collision name="base_collision">
+         <origin xyz="0 0 0.0365" rpy="0 0 0" />
+         <geometry>
+ 	        <cylinder radius="0.04" length="0.073"/>
+         </geometry>
+      </collision>
+      <visual name="base_visual">
+         <origin xyz="0 0 0.0" rpy="0 0 1.5707" />
+         <geometry>
+	         <mesh filename="package://porter_robot_model/meshes/os1_64.dae" /> 
+           <!-- <cylinder length="0.073" radius="0.04" /> -->
+         </geometry>
+      </visual>
+    </link>
+
+    <link name="os1_imu" />
+
+    <link name="os1_lidar" />
+
+
+    <joint name="imu_link_joint" type="fixed">
+      <parent link="os1_sensor" />
+      <child link="os1_imu" />
+      <origin xyz="0.006253 -0.011775 0.007645" rpy="0 0 0" />
+    </joint>
+    <gazebo reference="os1_imu">
+    </gazebo>
+
+    <joint name="lidar_link_joint" type="fixed">
+      <parent link="os1_sensor" />
+      <child link="os1_lidar" />
+      <origin xyz="0.0 0.0 0.03618" rpy="0 0 0" />
+    </joint>
+
+    <!-- Gazebo requires the ouster_gazebo_plugins package -->
+    <gazebo reference="os1_sensor">
+        <sensor type="ray" name="os1_sensor">
+          <pose>0 0 0 0 0 0</pose>
+          <visualize>false</visualize>
+          <update_rate>${lidar_hz}</update_rate>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>${lidar_samples}</samples>
+                <resolution>1</resolution>
+                <min_angle>${lidar_min_angle}</min_angle>
+                <max_angle>${lidar_max_angle}</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>${lidar_lasers}</samples>
+                <resolution>1</resolution>
+                <min_angle>-${15*M_PI/180.0}</min_angle>
+                <max_angle>${15*M_PI/180.0}</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>${lidar_min_range}</min>
+              <max>${lidar_max_range}</max>
+              <resolution>0.03</resolution>
+            </range>
+          </ray>
+          <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_ouster_laser.so">
+            <topicName>porter/${lidar_topic}</topicName>
+            <frameName>os1_lidar</frameName>
+            <min_range>${lidar_min_range}</min_range>
+            <max_range>${lidar_max_range}</max_range>
+            <gaussianNoise>${lidar_noise}</gaussianNoise>
+          </plugin>
+        </sensor>
+    </gazebo>
+
+    <!-- IMU -->
+  <gazebo>
+    <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
+      <robotNamespace>/</robotNamespace>
+      <updateRate>100.0</updateRate> 
+      <bodyName>os1_imu</bodyName>
+      <topicName>/porter/os1_cloud_node/imu</topicName>
+      <accelDrift>0.005 0.005 0.005</accelDrift>
+      <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
+      <rateDrift>0.005 0.005 0.005 </rateDrift>
+      <rateGaussianNoise>0.005 0.005 0.005 </rateGaussianNoise>
+      <headingDrift>0.005</headingDrift>
+      <headingGaussianNoise>0.005</headingGaussianNoise>
+    </plugin>
+  </gazebo>
+
+</robot>
