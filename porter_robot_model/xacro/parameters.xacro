@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="porter">
+	
+	<!-- Constants -->
+	<xacro:property name="M_PI" value="3.1415926535897931" />
+	
+	<!-- Topic names -->
+	<xacro:property name="command_topic_name" value="cmd_vel"/>
+	<xacro:property name="odometry_topic_name" value="odom"/>
+	
+	<!-- Link names -->
+	<xacro:property name="base_name" value="chasiss" />
+	<xacro:property name="base_link" value="${base_name}" />
+	
+ 	<!-- Joint_names -->
+  	<xacro:property name="left_wheel_joint_name" value="${base_name}_to_left_actuated_wheel"/>
+  	<xacro:property name="right_wheel_joint_name" value="${base_name}_to_right_actuated_wheel"/>
+	
+	<!-- Gazebo parameters -->
+  	<xacro:property name="wheel_torque_gazebo" value="100"/>
+  	<xacro:property name="wheel_acceleration_gazebo" value="100"/>
+  	<xacro:property name="update_rate_gazebo" value="50"/>
+	
+	
+	<!-- Parameters of the chasiss -->
+	<xacro:property name="base_length" value="0.7" />
+	<xacro:property name="base_width" value="0.7" />
+	<xacro:property name="base_thickness" value="0.045" />
+	<xacro:property name="base_mass" value="15"/>
+	
+	<!-- Parameters of the control box -->
+	<xacro:property name="cbox_length" value="0.7" />
+	<xacro:property name="cbox_width" value="0.7" />
+	<xacro:property name="cbox_height" value="0.5" />
+	<xacro:property name="cbox_mass" value="3"/>
+	
+	<!-- Parameters of the actuated wheels -->
+	<xacro:property name="ac_wh_distance" value="0.830" />
+	<xacro:property name="ac_wh_radius" value="0.127" />
+	<xacro:property name="ac_wh_thickness" value="0.048" />
+	<xacro:property name="ac_wh_mass" value="3"/>
+	<xacro:property name="ac_wh_posx" value="0.285"/>
+	<xacro:property name="ac_wh_posy" value="${ac_wh_distance/2}"/>
+	<xacro:property name="ac_wh_posz" value="0"/>
+	
+	<!-- Parameters of the free wheels -->
+	<xacro:property name="fr_wh_distance" value="0.670" />
+	<xacro:property name="fr_wh_radius" value="0.05" />
+	<xacro:property name="fr_wh_mass" value="1"/>
+	<xacro:property name="main_holder_mass" value="0.3"/>
+	<xacro:property name="supp_holder_mass" value="0.6"/>
+	
+	<!-- Parameters of the camera -->
+	<xacro:property name="camera_box_size" value="0.05" />
+	<xacro:property name="camera_posx" value="0.325" />
+	<xacro:property name="camera_posy" value="-0.10" />
+	<xacro:property name="camera_posz" value="0.00" />
+	
+	<!-- Parameters of the lidar -->
+	
+	<xacro:property name="lidar_posx" value="0.325" />
+	<xacro:property name="lidar_posy" value="0.10" />
+	<xacro:property name="lidar_posz" value="0.00" />
+	<xacro:property name="lidar_topic" value="/os1_cloud_node/points" />
+	<xacro:property name="lidar_hz" value="10" />
+	<xacro:property name="lidar_lasers" value="64" />
+	<xacro:property name="lidar_samples" value="512" />
+	<xacro:property name="lidar_min_range" value="0.9" />
+	<xacro:property name="lidar_max_range" value="75.0" />
+	<xacro:property name="lidar_noise" value="0.008" />
+	<xacro:property name="lidar_min_angle" value="-${M_PI}" />
+	<xacro:property name="lidar_max_angle" value="${M_PI}" />
+	
+	
+	<!-- Material block -->
+	<material name="blue">
+		<color rgba="0 0 0.8 1"/>
+	</material>
+ 
+	<material name="white">
+		<color rgba="1 1 1 1"/>
+	</material>
+
+	<material name="green">
+		<color rgba="0 0.8 0 1"/>
+	</material>
+	
+</robot>
