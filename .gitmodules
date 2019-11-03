@@ -1,6 +1,0 @@
-[submodule "ouster"]
-	path = ouster
-	url = https://github.com/CPFL/ouster.git
-[submodule "ouster_example"]
-	path = ouster_example
-	url = https://github.com/wilselby/ouster_example.git
