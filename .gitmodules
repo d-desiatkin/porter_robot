@@ -7,3 +7,6 @@
 [submodule "pylon-ros-camera"]
 	path = pylon-ros-camera
 	url = https://github.com/basler/pylon-ros-camera
+[submodule "dragandbot_common"]
+	path = dragandbot_common
+	url = https://github.com/dragandbot/dragandbot_common.git
