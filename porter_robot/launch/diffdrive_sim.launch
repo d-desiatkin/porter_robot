@@ -1,0 +1,46 @@
+<launch>
+	<!-- This needed due to bug in rviz visualization on melodic. When bug is fixed line below could be deleted -->
+	<env name="LC_NUMERIC" value="en_US.UTF-8" />
+	<arg name="model" default="$(find porter_robot_model)/xacro/model.xacro"/>
+	<arg name="rvizconfig" default="$(find porter_robot_simulation)/rviz/default.rviz" />
+
+
+	<include file="$(find porter_robot_simulation)/launch/gazebo.launch">
+		<arg name="model" value="$(arg model)" />
+		<arg name="spawn_height" value="1.0" />
+	</include>
+	
+	
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
+
+	<rosparam command="load"
+				file="$(find porter_robot)/config/joints.yaml"
+				ns="porter/joint_state_controller" />
+	<rosparam command="load"
+				file="$(find porter_robot)/config/diffdrive.yaml"
+				ns="porter/diff_drive_controller" />
+
+	<node name="porter_controller_spawner" pkg="controller_manager" type="spawner"
+		args="porter/joint_state_controller
+		porter/diff_drive_controller
+		--timeout 60"/>
+		
+	
+	<node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
+    	<param name="publish_frequency" type="double" value="60.0" />
+  	</node>
+	
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+              <param name="use_gui" value="False"/>
+    </node>
+    
+	
+	<node pkg="porter_odometry" type="odom" name="porter_odometry" output="screen">
+			
+	</node>
+	
+	
+	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+		<param name="default_topic" value="/porter/diff_drive_controller/cmd_vel"/>
+	</node>
+</launch>
