@@ -4,3 +4,6 @@
 [submodule "ouster_example"]
 	path = ouster_example
 	url = https://github.com/ouster-lidar/ouster_example
+[submodule "pylon-ros-camera"]
+	path = pylon-ros-camera
+	url = https://github.com/basler/pylon-ros-camera
