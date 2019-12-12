@@ -10,7 +10,6 @@
 	
 	<!-- Link names -->
 	<xacro:property name="base_name" value="chasiss" />
-	<xacro:property name="base_link" value="${base_name}" />
 	
  	<!-- Joint_names -->
   	<xacro:property name="left_wheel_joint_name" value="${base_name}_to_left_actuated_wheel"/>
@@ -28,11 +27,11 @@
 	<xacro:property name="base_thickness" value="0.045" />
 	<xacro:property name="base_mass" value="15"/>
 	
-	<!-- Parameters of the control box -->
-	<xacro:property name="cbox_length" value="0.7" />
-	<xacro:property name="cbox_width" value="0.7" />
-	<xacro:property name="cbox_height" value="0.5" />
-	<xacro:property name="cbox_mass" value="3"/>
+	<!-- Parameters of the support -->
+	<xacro:property name="support_length" value="0.11" />
+	<xacro:property name="support_width" value="0.11" />
+	<xacro:property name="support_height" value="0.18" />
+	<xacro:property name="support_mass" value="3"/>
 	
 	<!-- Parameters of the actuated wheels -->
 	<xacro:property name="ac_wh_distance" value="0.830" />
@@ -52,14 +51,14 @@
 	
 	<!-- Parameters of the camera -->
 	<xacro:property name="camera_box_size" value="0.05" />
-	<xacro:property name="camera_posx" value="0.325" />
+	<xacro:property name="camera_posx" value="0.0" />
 	<xacro:property name="camera_posy" value="-0.10" />
-	<xacro:property name="camera_posz" value="0.00" />
+	<xacro:property name="camera_posz" value="-0.09" />
 	
 	<!-- Parameters of the lidar -->
 	
-	<xacro:property name="lidar_posx" value="0.325" />
-	<xacro:property name="lidar_posy" value="0.10" />
+	<xacro:property name="lidar_posx" value="0.0" />
+	<xacro:property name="lidar_posy" value="0.0" />
 	<xacro:property name="lidar_posz" value="0.00" />
 	<xacro:property name="lidar_topic" value="/os1_cloud_node/points" />
 	<xacro:property name="lidar_hz" value="10" />

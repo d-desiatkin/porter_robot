@@ -25,26 +25,26 @@
 	
 
  	
- 	<link name="control_box">
+ 	<link name="support">
 		<visual>
 			<geometry>
-				<box size="${cbox_length} ${cbox_width} ${cbox_height}"/>
+				<box size="${support_length} ${support_width} ${support_height}"/>
 			</geometry>
 			<origin rpy="0 0 0" xyz="0 0 0"/>
 			<material name="blue"/>
 		</visual>
 		<collision>
 			<geometry>
-				<box size="${cbox_length} ${cbox_width} ${cbox_height}"/>
+				<box size="${support_length} ${support_width} ${support_height}"/>
 			</geometry>
 		</collision>
-		<xacro:ch_inertial mass="${cbox_mass}" length="${cbox_length}" width="${cbox_width}" thickness="${cbox_height}"/>
+		<xacro:ch_inertial mass="${support_mass}" length="${support_length}" width="${support_width}" thickness="${support_height}"/>
 	</link>
 	
-	<joint name="${base_name}_to_control_box" type="fixed">
+	<joint name="${base_name}_to_support" type="fixed">
 		<parent link="${base_name}"/>
-		<child link="control_box"/>
-		<origin rpy="0 0 0" xyz="0.0 0.0 ${(cbox_height/2+base_thickness/2)}"/>
+		<child link="support"/>
+		<origin rpy="0 0 0" xyz="0.0 0.0 ${(support_height/2+base_thickness/2)}"/>
 	</joint>
  	
 	<xacro:actuated_wheel prefix="right">
