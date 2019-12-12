@@ -5,8 +5,8 @@
   <!-- <xacro:macro name="OS1-64" params=" name:=  hz:=10 lasers:=64 samples:=512 min_range:=0.9 max_range:=75.0 noise:=0.008 min_angle:=-${M_PI} max_angle:=${M_PI}"> -->
 
     <joint name="mount_joint" type="fixed">
-      <origin xyz="${lidar_posx} ${lidar_posy} ${cbox_height/2 + 0.073/2 + lidar_posz}" rpy="0 0 0"/>
-      <parent link="control_box"/>
+      <origin xyz="${lidar_posx} ${lidar_posy} ${support_height/2 + 0.073/2 + lidar_posz}" rpy="0 0 0"/>
+      <parent link="support"/>
       <child link="os1_sensor"/>
     </joint>
 

@@ -26,8 +26,8 @@
 	
 	<joint name="camera_joint" type="fixed">
 		<axis xyz="0 0 0" />
-		<origin xyz="${camera_posx} ${camera_posy} ${cbox_height/2 + camera_box_size/2 + camera_posz}" rpy="0 0 0"/>
-		<parent link="control_box"/>
+		<origin xyz="${camera_posx} ${camera_posy} ${support_height/2 + camera_box_size/2 + camera_posz}" rpy="0 0 0"/>
+		<parent link="support"/>
 		<child link="camera_main"/>
 	</joint>
 
