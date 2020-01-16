@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rospy
 import odrive
 from odrive.enums import *
@@ -50,12 +50,13 @@ odrv0.axis1.controller.config.vel_limit = 1000
 odrv0.axis1.controller.config.control_mode = CTRL_MODE_VELOCITY_CONTROL
 
 odrv0.save_configuration()
+sleep(5)
 
 try:
     odrv0.reboot()
 except Exception:
     pass
-sleep(1)
+sleep(2)
 
 odrv0 = odrive.find_any()
 
@@ -120,7 +121,7 @@ try:
     odrv0.reboot()
 except Exception:
     pass
-sleep(1)
+sleep(2)
 odrv0 = odrive.find_any()
 
 #Parameters check

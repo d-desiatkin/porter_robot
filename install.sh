@@ -20,7 +20,7 @@ sudo echo "domain-needed" >> /etc/dnsmasq.conf
 sudo echo "bogus-priv" >> /etc/dnsmasq.conf
 sudo echo "strict-order" >> /etc/dnsmasq.conf
 sudo echo "bind-interfaces" >> /etc/dnsmasq.conf
-sudo echo "listen-address=127.0.0.1" >> /etc/dnsmasq.conf
+sudo echo "interface=eth0" >> /etc/dnsmasq.conf
 sudo echo "dhcp-range=10.5.5.80,static" >> /etc/dnsmasq.conf
 # Important line. It means give the host with specific name special static ip.
 # Particulary lidar says its name, and we assign special ip to it.
@@ -31,10 +31,15 @@ sudo echo "dhcp-host=os1-991936000848,10.5.5.80,infinite" >> /etc/dnsmasq.conf
 # to ip address what our dns provided to our lidar.
 sudo echo "10.5.5.80	os1-991936000848" >> /etc/hosts
 
-sudo echo "auto eth0" >> /etc/network/interfaces
-sudo echo "iface eth0 inet static" >> /etc/network/interfaces
-sudo echo "address 10.5.5.1" >> /etc/network/interfaces
-sudo echo "netmask 255.255.255.0" >> /etc/network/interfaces
+# Modification of standart network manager that described in ouster vendor documentation
+# Here we assign constant ip to ethernet interface.
+# It is required for proper work of dhcp server
+sudo touch /etc/network/interfaces.d/eth0
+sudo echo "auto lo eth0" >> /etc/network/interfaces.d/eth0
+sudo echo "iface lo inet loopback" >> /etc/network/interfaces.d/eth0
+sudo echo "iface eth0 inet static" >> /etc/network/interfaces.d/eth0
+sudo echo "	address 10.5.5.1" >> /etc/network/interfaces.d/eth0
+sudo echo "	netmask 255.255.255.0" >> /etc/network/interfaces.d/eth0
 
 # restart dns server with new configuration.
 sudo systemctl restart NetworkManager

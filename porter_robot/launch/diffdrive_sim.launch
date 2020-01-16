@@ -8,7 +8,7 @@
 	<include file="$(find porter_robot_simulation)/launch/gazebo.launch">
 		<arg name="model" value="$(arg model)" />
 		<arg name="spawn_height" value="1.0" />
-		<arg name="world_name" value="blanc_world" />
+		<arg name="world_name" value="small_town_world" />
 	</include>
 	
 	
