@@ -12,7 +12,7 @@
     <gazebo>
     
 		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-			<robotNamespace>/</robotNamespace>
+			<robotNamespace>/porter</robotNamespace>
 		</plugin>
 		
         <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so" >
@@ -30,7 +30,7 @@
             <updateRate>${update_rate_gazebo}</updateRate>
             <leftJoint>${left_wheel_joint_name}</leftJoint>
             <rightJoint>${right_wheel_joint_name}</rightJoint>
-            <publishTf>1</publishTf>
+            <publishTf>true</publishTf>
         </plugin>
     </gazebo>
     
