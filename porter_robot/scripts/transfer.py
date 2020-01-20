@@ -35,10 +35,17 @@ def transfer(odrv0):
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
+       
 
 if __name__ == '__main__':
-	odrv0 = odrive.find_any()
-	print(odrv0.vbus_voltage)
-	odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-	odrv0.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-	transfer(odrv0)
+    odrv0 = odrive.find_any()
+    print(odrv0.vbus_voltage)
+    odrv0.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+    odrv0.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+    transfer(odrv0)
+    try:
+        rospy.spin()
+    except:
+        print("Stopping transfer")
+        odrv0.axis0.requested_state = AXIS_STATE_IDLE
+        odrv0.axis1.requested_state = AXIS_STATE_IDLE
