@@ -11,8 +11,8 @@
 	
 	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
 		<param name="base_frame" value="chasiss" />
-		<param name="odom_frame" value="/odom" />
-		<param name="map_frame" value="/map" />
+		<param name="odom_frame" value="odom" />
+		<param name="map_frame" value="map" />
 		<param name="maxUrange" value="50.0" />
 		<param name="maxRange" value="70.0" />
 		<param name="throttle_scans" value="1" />

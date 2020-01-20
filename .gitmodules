@@ -10,3 +10,6 @@
 [submodule "dragandbot_common"]
 	path = dragandbot_common
 	url = https://github.com/dragandbot/dragandbot_common.git
+[submodule "odrive_ros"]
+	path = odrive_ros
+	url = https://github.com/AMABerkeley/odrive_ros.git

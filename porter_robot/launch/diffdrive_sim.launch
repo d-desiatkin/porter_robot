@@ -29,7 +29,7 @@
 	<node name="controller_spawner" ns="porter" pkg="controller_manager" type="spawner"
 		args="joint_state_controller
 		diff_drive_controller
-		--timeout 60"/>
+		--timeout 90"/>
 		
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" ns="porter">
     	<param name="publish_frequency" type="double" value="60.0" />
