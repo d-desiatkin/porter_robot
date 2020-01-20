@@ -4,22 +4,11 @@
 	<!-- Constants -->
 	<xacro:property name="M_PI" value="3.1415926535897931" />
 	
-	<!-- Topic names -->
-	<xacro:property name="command_topic_name" value="cmd_vel"/>
-	<xacro:property name="odometry_topic_name" value="odom"/>
-	
 	<!-- Link names -->
 	<xacro:property name="base_name" value="chasiss" />
 	
- 	<!-- Joint_names -->
-  	<xacro:property name="left_wheel_joint_name" value="${base_name}_to_left_actuated_wheel"/>
-  	<xacro:property name="right_wheel_joint_name" value="${base_name}_to_right_actuated_wheel"/>
-	
 	<!-- Gazebo parameters -->
-  	<xacro:property name="wheel_torque_gazebo" value="100"/>
-  	<xacro:property name="wheel_acceleration_gazebo" value="100"/>
   	<xacro:property name="update_rate_gazebo" value="50"/>
-	
 	
 	<!-- Parameters of the chasiss -->
 	<xacro:property name="base_length" value="0.7" />
@@ -60,7 +49,7 @@
 	<xacro:property name="lidar_posx" value="0.0" />
 	<xacro:property name="lidar_posy" value="0.0" />
 	<xacro:property name="lidar_posz" value="0.00" />
-	<xacro:property name="lidar_topic" value="/os1_cloud_node/points" />
+	<xacro:property name="lidar_topic" value="os1_cloud_node/points" />
 	<xacro:property name="lidar_hz" value="10" />
 	<xacro:property name="lidar_lasers" value="64" />
 	<xacro:property name="lidar_samples" value="512" />

@@ -78,8 +78,10 @@
               <resolution>0.03</resolution>
             </range>
           </ray>
+          
           <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_ouster_laser.so">
-            <topicName>${lidar_topic}</topicName>
+          	<robotNamespace>/porter</robotNamespace>
+            <topicName>/porter/${lidar_topic}</topicName>
             <frameName>os1_lidar</frameName>
             <min_range>${lidar_min_range}</min_range>
             <max_range>${lidar_max_range}</max_range>
@@ -91,10 +93,10 @@
     <!-- IMU -->
   <gazebo>
     <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
-      <robotNamespace>/</robotNamespace>
+      <robotNamespace>/porter</robotNamespace>
       <updateRate>100.0</updateRate> 
       <bodyName>os1_imu</bodyName>
-      <topicName>/os1_cloud_node/imu</topicName>
+      <topicName>/porter/os1_cloud_node/imu</topicName>
       <accelDrift>0.005 0.005 0.005</accelDrift>
       <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
       <rateDrift>0.005 0.005 0.005 </rateDrift>

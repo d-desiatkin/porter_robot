@@ -24,7 +24,7 @@
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
   <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
-        args="-urdf -param robot_description -model porter -robot_namespace $(arg robot_ns) -unpause -wait porter -z $(arg spawn_height)"  respawn="false" output="screen" />
+        args="-urdf -param robot_description -model porter -robot_namespace $(arg robot_ns) -unpause -z $(arg spawn_height)"  respawn="false" output="screen" />
         
 
 </launch>

@@ -18,7 +18,7 @@
   <arg name="use_clock_frequency" default="false"/>
   <arg name="pub_clock_frequency" default="100"/>
   <arg name="enable_ros_network" default="true" />
-  <remap from="tf" to="gazebo_tf"/>
+  <!-- <remap from="tf" to="gazebo_tf"/> -->
   <!-- <remap from="odom" to="gazebo_odom"/> -->
 
   <!-- set use_sim_time flag -->

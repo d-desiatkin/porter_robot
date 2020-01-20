@@ -16,7 +16,9 @@
 	
 	
 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
-
+	
+	<param name="porter/robot_description" command="xacro $(arg model)" />
+	
 	<rosparam command="load"
 				file="$(find porter_robot)/config/joints.yaml"
 				ns="porter/joint_state_controller" />
@@ -24,27 +26,21 @@
 				file="$(find porter_robot)/config/diffdrive.yaml"
 				ns="porter/diff_drive_controller" />
 
-	<node name="porter_controller_spawner" ns="/porter" pkg="controller_manager" type="spawner" 
-		args="porter/joint_state_controller
-		porter/diff_drive_controller
-		--timeout 30"/>
+	<node name="controller_spawner" ns="porter" pkg="controller_manager" type="spawner"
+		args="joint_state_controller
+		diff_drive_controller
+		--timeout 60"/>
 		
-	
-	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" ns="porter">
     	<param name="publish_frequency" type="double" value="60.0" />
   	</node>
 	
-	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+	<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" ns="porter">
               <param name="use_gui" value="False"/>
     </node>
     
-	
-	<node pkg="porter_odometry" type="odom" name="porter_odometry" output="screen">
-			
-	</node>
-	
-	
-	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+    <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
 		<param name="default_topic" value="/porter/diff_drive_controller/cmd_vel"/>
 	</node>
+
 </launch>
