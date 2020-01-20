@@ -1,15 +1,10 @@
-[submodule "slam_gmapping"]
-	path = slam_gmapping
-	url = https://github.com/ros-perception/slam_gmapping
 [submodule "ouster_example"]
 	path = ouster_example
 	url = https://github.com/ouster-lidar/ouster_example
-[submodule "pylon-ros-camera"]
-	path = pylon-ros-camera
-	url = https://github.com/basler/pylon-ros-camera
 [submodule "dragandbot_common"]
 	path = dragandbot_common
 	url = https://github.com/dragandbot/dragandbot_common.git
 [submodule "odrive_ros"]
 	path = odrive_ros
 	url = https://github.com/neomanic/odrive_ros.git
+

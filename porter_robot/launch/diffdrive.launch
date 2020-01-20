@@ -8,6 +8,7 @@
 	
 	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
 	
+	<param name="robot_description" command="xacro $(arg model)" />
 	<param name="porter/robot_description" command="xacro $(arg model)" />
 	
 	<rosparam command="load"
@@ -20,7 +21,7 @@
 	<node name="controller_spawner" ns="porter" pkg="controller_manager" type="spawner"
 		args="joint_state_controller
 		diff_drive_controller
-		--timeout 90"/>
+		--timeout 30"/>
 		
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" ns="porter">
     	<param name="publish_frequency" type="double" value="60.0" />
@@ -30,7 +31,7 @@
               <param name="use_gui" value="False"/>
     </node>
 
-	<node pkg="odrive_ros" type="odrive_node.py" name="odrive" ns="odrive" 
+	<node pkg="odrive_ros" type="odrive_node.py" name="odrive" ns="porter/odrive" 
             output="screen" respawn="false">
         <param name="wheel_track" value="0.83"/>
         <param name="tyre_circumference" value="0.79796453401"/>
