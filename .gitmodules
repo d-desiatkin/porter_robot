@@ -1,6 +1,3 @@
-[submodule "ouster_example"]
-	path = ouster_example
-	url = https://github.com/ouster-lidar/ouster_example
 [submodule "dragandbot_common"]
 	path = dragandbot_common
 	url = https://github.com/dragandbot/dragandbot_common.git
@@ -14,3 +11,6 @@
 [submodule "ODrive-ros-for-diploma"]
 	path = ODrive-ros-for-diploma
 	url = https://github.com/d-desiatkin/ODrive-ros-for-diploma.git
+[submodule "ouster"]
+	path = ouster
+	url = https://github.com/CPFL/ouster.git
