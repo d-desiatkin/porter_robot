@@ -6,15 +6,15 @@
 
 	<arg name="rvizconfig" default="$(find porter_robot_simulation)/rviz/default.rviz" />
 	
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
+	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" /> -->
 	
 	<param name="porter/robot_description" command="xacro $(arg model)" />
 
 	<group ns="porter">
 		
 		<include file="$(find ouster_driver)/launch/os1.launch">
-			<arg name="node_name" value="os1_cloud_node" />
 			<arg name="lidar_address" value="10.5.5.80" />
+			<arg name="node_name" value="os1_cloud_node" />
 			<arg name="pc_address" value="10.5.5.1" />
 			<arg name="pointcloud_mode" value="NATIVE" />
 			<arg name="lidar_frame_name" value="os1_lidar" />
@@ -26,36 +26,34 @@
 		</include>
 		
 		<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
-    		<param name="publish_frequency" type="double" value="60.0" />
-  		</node>
-	
-		<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-              <param name="use_gui" value="False"/>
-    	</node>
+			<param name="publish_frequency" type="double" value="50.0" />
+		</node>
 	
 
 		<node pkg="odrive_ros" type="odrive_node" name="odrive" output="screen" respawn="false">
 			<param name="wheel_track" value="0.88"/>
 			<param name="tyre_circumference" value="0.79796453401"/>
-        
-        	<param name="connect_on_startup"   value="true"/>
-        	<param name="calibrate_on_startup" value="false"/>
-        	<param name="engage_on_startup"    value="true"/>
-        
-        	<param name="publish_odom"         value="true"/>
-       		<param name="publish_odom_tf"      value="true"/>
-		
-			<param name="~base_frame"		   value="chasiss"/>
-			<param name="~axis_for_right"	   value="1"/>
 
-			<remap from="/cmd_vel" to="/porter/cmd_vel"/>
+			<param name="connect_on_startup"    value="true"/>
+			<param name="calibrate_on_startup" value="false"/>
+			<param name="engage_on_startup"     value="true"/>
+
+			<param name="publish_odom"          value="true"/>
+			<param name="publish_odom_tf"       value="true"/>
+
+			<param name="~base_frame"		     value="chasiss"/>
+			<param name="~axis_for_right"	         value="1"/>
+
+			<param name="~odom_calc_hz"           value="50"/>
+
+			<remap from="/cmd_vel"      to="/porter/cmd_vel"/>
 			<remap from="/odrive/joint_states" to="/porter/joint_states"/>
-    	</node>
+		</node>
     
-    	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+    <!--	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
 			<param name="default_topic" value="/porter/cmd_vel"/>
 		</node>
-
+	-->
 	</group>
 
 </launch>
