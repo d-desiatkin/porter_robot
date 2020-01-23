@@ -6,6 +6,6 @@ inflation_radius: 0.3
 
 observation_sources: laser_scan_sensor # point_cloud_sensor  
 
-laser_scan_sensor: {sensor_frame: os1_lidar, data_type: LaserScan, topic: porter/os1_cloud_node/scan, marking: true, clearing: true}
+laser_scan_sensor: {sensor_frame: os1_sensor, data_type: LaserScan, topic: porter/os1_cloud_node/scan, marking: true, clearing: true}
 
 # point_cloud_sensor: {sensor_frame: os1_sensor, data_type: PointCloud2, topic: porter/os1_cloud_node/points, marking: true, clearing: true}
