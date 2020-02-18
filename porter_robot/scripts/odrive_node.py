@@ -10,6 +10,7 @@ import std_srvs.srv
 import odrive
 from odrive.enums import *
 import math
+import serial
 
 
 def get_param(name, default):
@@ -40,15 +41,15 @@ class ODriveNode(object):
     old_pos_l = 0
     old_pos_r = 0
     driver = None
+    ser = None
 
-    def __init__(self, odrv=None):
+    def __init__(self):
 
         rospy.init_node('odrive', anonymous=False)
         rospy.Rate(50)
         rospy.on_shutdown(self.terminate)
-        if not odrv:
-            odrv = odrive.find_any()
-        self.driver = odrv
+        self.ser = serial.Serial('/dev/ttyTHS2', 115200)  # open serial port
+        rospy.loginfo("Used port: %s", str(self.ser.name))
 
         rospy.Subscriber("diff_drive_controller/cmd_vel", Twist, self.drive)
         self.odom_pub = rospy.Publisher("diff_drive_controller/odom", Odometry, queue_size=1)
@@ -57,15 +58,25 @@ class ODriveNode(object):
 
         rospy.Service('reset_odometry', std_srvs.srv.Trigger, self.reset_odometry)
 
-        rospy.loginfo("Current plate voltage: %s", str(self.driver.vbus_voltage))
+        self.ser.write(b'r vbus_voltage')
+        vbus_voltage = self.ser.readline()
 
-        self.driver.axis0.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
-        self.driver.axis1.requested_state = AXIS_STATE_CLOSED_LOOP_CONTROL
+        rospy.loginfo("Current plate voltage: %s", vbus_voltage)
 
-        if self.driver.axis0.encoder.config.cpr == self.driver.axis1.encoder.config.cpr:
-            self.encoder_cpr = self.driver.axis0.encoder.config.cpr
+        self.ser.write(b'w axis0.requested_state {}'.format(AXIS_STATE_CLOSED_LOOP_CONTROL))
+        self.ser.write(b'w axis1.requested_state {}'.format(AXIS_STATE_CLOSED_LOOP_CONTROL))
+
+        self.ser.write(b'r axis0.encoder.config.cpr')
+        axis0_encoder_config_cpr = self.ser.readline()
+
+        self.ser.write(b'r axis1.encoder.config.cpr')
+        axis1_encoder_config_cpr = self.ser.readline()
+
+        if axis0_encoder_config_cpr == axis1_encoder_config_cpr:
+            self.encoder_cpr = float(axis0_encoder_config_cpr)
         else:
             rospy.loginfo("Your encoders have different cpr. Are you sure that it is correct?")
+            rospy.signal_shutdown("I can't work with different encoders cpr")
 
         rospy.sleep(1)
         nm = rospy.get_name()
@@ -116,11 +127,15 @@ class ODriveNode(object):
     def odometry(self):
 
         if self.fast_timer_comms_active:
-            right_vel = self.driver.axis0.encoder.vel_estimate
-            left_vel = -self.driver.axis1.encoder.vel_estimate
+            self.ser.write(b'r axis0.encoder.vel_estimate')
+            right_vel = float(self.ser.readline())
+            self.ser.write(b'r axis1.encoder.vel_estimate')
+            left_vel = -float(self.ser.readline())
 
-            self.new_pos_r = self.driver.axis0.encoder.pos_cpr
-            self.new_pos_l = -self.driver.axis1.encoder.pos_cpr
+            self.ser.write(b'r axis0.encoder.pos_cpr')
+            self.new_pos_r = float(self.ser.readline())
+            self.ser.write(b'r axis1.encoder.pos_cpr')
+            self.new_pos_l = -float(self.ser.readline())
 
             now = rospy.Time.now()
             self.odom_msg.header.stamp = now
@@ -187,7 +202,7 @@ class ODriveNode(object):
 
     def joint_angles(self):
         self.joint_state_msg.header.stamp = rospy.Time.now()
-        if self.driver:
+        if self.ser:
             self.joint_state_msg.position[0] = 2 * math.pi * self.new_pos_l / self.encoder_cpr
             self.joint_state_msg.position[1] = 2 * math.pi * self.new_pos_r / self.encoder_cpr
         self.joint_state_publisher.publish(self.joint_state_msg)
@@ -201,17 +216,17 @@ class ODriveNode(object):
         # rospy.loginfo(rospy.get_caller_id() + "I heard: \n %s", data)
         V = data.linear.x
         W = data.angular.z
-        left = V + L / 2.0 * W
-        left = left / self.tyre_circumference * self.encoder_cpr
-        right = V - L / 2.0 * W
-        right = right / self.tyre_circumference * self.encoder_cpr * (-1.0)
-        self.driver.axis0.controller.vel_setpoint = left
-        self.driver.axis1.controller.vel_setpoint = right
+        left = V - L / 2.0 * W
+        left = left / self.tyre_circumference * self.encoder_cpr * (-1.0)
+        right = V + L / 2.0 * W
+        right = right / self.tyre_circumference * self.encoder_cpr
+        self.ser.write(b'w axis0.controller.vel_setpoint {}'.format(right))
+        self.ser.write(b'w axis1.controller.vel_setpoint {}'.format(left))
 
 
     def terminate(self):
-        self.driver.axis0.requested_state = AXIS_STATE_IDLE
-        self.driver.axis1.requested_state = AXIS_STATE_IDLE
+        self.ser.write(b'w axis0.requested_state {}'.format(AXIS_STATE_IDLE))
+        self.ser.write(b'w axis1.requested_state {}'.format(AXIS_STATE_IDLE))
 
     def run(self):
         self.fast_timer_comms_active = True
