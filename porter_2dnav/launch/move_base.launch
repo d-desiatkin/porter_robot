@@ -29,7 +29,7 @@
 		<rosparam file="$(find porter_2dnav)/config/global_costmap_params.yaml" command="load" /> 
 		<rosparam file="$(find porter_2dnav)/config/base_local_planner_params.yaml" command="load" />
 		<!-- <remap from="/cmd_vel" to="/porter/diff_drive_controller/cmd_vel" /> -->
-		<remap from="/cmd_vel" to="/porter/cmd_vel" />
+		<remap from="/cmd_vel" to="/porter/diff_drive_controller/cmd_vel" />
 	</node>
 
 </launch> 

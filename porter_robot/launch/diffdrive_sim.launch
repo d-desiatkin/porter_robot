@@ -39,7 +39,7 @@
               <param name="use_gui" value="False"/>
     </node>
     
-    <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+    <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" ns="porter">
 		<param name="default_topic" value="/porter/diff_drive_controller/cmd_vel"/>
 	</node>
 
