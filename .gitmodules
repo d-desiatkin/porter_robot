@@ -8,9 +8,6 @@
 [submodule "ODrive"]
 	path = ODrive
 	url = https://github.com/madcowswe/ODrive
-[submodule "ODrive-ros-for-diploma"]
-	path = ODrive-ros-for-diploma
-	url = https://github.com/d-desiatkin/ODrive-ros-for-diploma.git
 [submodule "ouster-for-diploma"]
 	path = ouster-for-diploma
 	url = https://github.com/d-desiatkin/ouster-for-diploma.git
