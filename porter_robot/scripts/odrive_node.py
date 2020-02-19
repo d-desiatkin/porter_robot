@@ -59,19 +59,15 @@ class ODriveNode(object):
 
         rospy.Service('reset_odometry', std_srvs.srv.Trigger, self.reset_odometry)
 
-        self.ser_write(b'r vbus_voltage\n')
-        vbus_voltage = self.ser_read()
+        vbus_voltage = self.driver_read(b"vbus_voltage")
 
         rospy.loginfo("Current plate voltage: %s", vbus_voltage)
 
-        self.ser_write(b'w axis0.requested_state {}\n'.format(AXIS_STATE_CLOSED_LOOP_CONTROL))
-        self.ser_write(b'w axis1.requested_state {}\n'.format(AXIS_STATE_CLOSED_LOOP_CONTROL))
+        self.driver_write(b'axis0.requested_state {}'.format(AXIS_STATE_CLOSED_LOOP_CONTROL))
+        self.driver_write(b'axis1.requested_state {}'.format(AXIS_STATE_CLOSED_LOOP_CONTROL))
 
-        self.ser_write(b'r axis0.encoder.config.cpr\n')
-        axis0_encoder_config_cpr = str(self.ser_read())
-
-        self.ser_write(b'r axis1.encoder.config.cpr\n')
-        axis1_encoder_config_cpr = str(self.ser_read())
+        axis0_encoder_config_cpr = str(self.driver_read(b'axis0.encoder.config.cpr'))
+        axis1_encoder_config_cpr = str(self.driver_read(b'axis1.encoder.config.cpr'))
 
         if axis0_encoder_config_cpr == axis1_encoder_config_cpr:
             self.encoder_cpr = float(axis0_encoder_config_cpr)
@@ -128,79 +124,74 @@ class ODriveNode(object):
 
     def odometry(self):
 
-        if self.fast_timer_comms_active:
-            self.ser_write(b'r axis0.encoder.vel_estimate\n')
-            right_vel = float(self.ser_read())
-            self.ser_write(b'r axis1.encoder.vel_estimate\n')
-            left_vel = -float(self.ser_read())
+        right_vel = float(self.driver_read(b'axis0.encoder.vel_estimate'))
+        left_vel = -float(self.driver_read(b'axis1.encoder.vel_estimate'))
 
-            self.ser_write(b'r axis0.encoder.pos_cpr\n')
-            self.new_pos_r = float(self.ser_read())
-            self.ser_write(b'r axis1.encoder.pos_cpr\n')
-            self.new_pos_l = -float(self.ser_read())
+        self.new_pos_r = float(self.driver_read(b'axis0.encoder.pos_cpr'))
+        self.new_pos_l = -float(self.driver_read(b'axis1.encoder.pos_cpr'))
 
-            now = rospy.Time.now()
-            self.odom_msg.header.stamp = now
-            self.tf_msg.header.stamp = now
+        now = rospy.Time.now()
+        self.odom_msg.header.stamp = now
+        self.tf_msg.header.stamp = now
 
-            # Twist/velocity: calculated from motor values only
-            s = self.tyre_circumference * (left_vel + right_vel) / (2.0 * self.encoder_cpr)
-            w = self.tyre_circumference * (right_vel - left_vel) / (
-                    self.wheel_track * self.encoder_cpr)  # angle: vel_r*tyre_radius - vel_l*tyre_radius
+        # Twist/velocity: calculated from motor values only
+        s = self.tyre_circumference * (left_vel + right_vel) / (2.0 * self.encoder_cpr)
+        w = self.tyre_circumference * (right_vel - left_vel) / (
+                self.wheel_track * self.encoder_cpr)  # angle: vel_r*tyre_radius - vel_l*tyre_radius
 
-            self.odom_msg.twist.twist.linear.x = s
-            self.odom_msg.twist.twist.angular.z = w
+        self.odom_msg.twist.twist.linear.x = s
+        self.odom_msg.twist.twist.angular.z = w
 
-            delta_pos_l = self.new_pos_l - self.old_pos_l
-            delta_pos_r = self.new_pos_r - self.old_pos_r
+        delta_pos_l = self.new_pos_l - self.old_pos_l
+        delta_pos_r = self.new_pos_r - self.old_pos_r
 
-            half_cpr = self.encoder_cpr / 2.0
-            if delta_pos_l > half_cpr:
-                delta_pos_l = delta_pos_l - self.encoder_cpr
-            elif delta_pos_l < -half_cpr:
-                delta_pos_l = delta_pos_l + self.encoder_cpr
-            if delta_pos_r > half_cpr:
-                delta_pos_r = delta_pos_r - self.encoder_cpr
-            elif delta_pos_r < -half_cpr:
-                delta_pos_r = delta_pos_r + self.encoder_cpr
+        half_cpr = self.encoder_cpr / 2.0
+        if delta_pos_l > half_cpr:
+            delta_pos_l = delta_pos_l - self.encoder_cpr
+        elif delta_pos_l < -half_cpr:
+            delta_pos_l = delta_pos_l + self.encoder_cpr
+        if delta_pos_r > half_cpr:
+            delta_pos_r = delta_pos_r - self.encoder_cpr
+        elif delta_pos_r < -half_cpr:
+            delta_pos_r = delta_pos_r + self.encoder_cpr
 
-            self.old_pos_l = self.new_pos_l
-            self.old_pos_r = self.new_pos_r
+        self.old_pos_l = self.new_pos_l
+        self.old_pos_r = self.new_pos_r
 
-            # counts to metres
-            delta_pos_l_m = delta_pos_l / self.m_s_to_value
-            delta_pos_r_m = delta_pos_r / self.m_s_to_value
+        # counts to metres
+        delta_pos_l_m = delta_pos_l / self.m_s_to_value
+        delta_pos_r_m = delta_pos_r / self.m_s_to_value
 
-            # Distance travelled
-            d = (delta_pos_l_m + delta_pos_r_m) / 2.0  # delta_ps
-            th = (delta_pos_r_m - delta_pos_l_m) / self.wheel_track  # works for small angles
+        # Distance travelled
+        d = (delta_pos_l_m + delta_pos_r_m) / 2.0  # delta_ps
+        th = (delta_pos_r_m - delta_pos_l_m) / self.wheel_track  # works for small angles
 
-            xd = math.cos(th) * d
-            yd = -math.sin(th) * d
+        xd = math.cos(th) * d
+        yd = -math.sin(th) * d
 
-            # Pose: updated from previous pose + position delta
-            self.cur_x += math.cos(self.cur_theta) * xd - math.sin(self.cur_theta) * yd
-            self.cur_y += math.sin(self.cur_theta) * xd + math.cos(self.cur_theta) * yd
-            self.cur_theta = (self.cur_theta + th) % (2 * math.pi)
+        # Pose: updated from previous pose + position delta
+        self.cur_x += math.cos(self.cur_theta) * xd - math.sin(self.cur_theta) * yd
+        self.cur_y += math.sin(self.cur_theta) * xd + math.cos(self.cur_theta) * yd
+        self.cur_theta = (self.cur_theta + th) % (2 * math.pi)
 
-            # fill odom message and publish
-            self.odom_msg.pose.pose.position.x = self.cur_x
-            self.odom_msg.pose.pose.position.y = self.cur_y
-            # rospy.loginfo('  %s: %s', str(self.odom_msg.pose.pose.position.x), str(self.odom_msg.pose.pose.position.y))
-            q = tf_conversions.transformations.quaternion_from_euler(0.0, 0.0, self.cur_theta)
-            self.odom_msg.pose.pose.orientation.z = q[2]  # math.sin(self.theta)/2
-            self.odom_msg.pose.pose.orientation.w = q[3]  # math.cos(self.theta)/2
+        # fill odom message and publish
+        self.odom_msg.pose.pose.position.x = self.cur_x
+        self.odom_msg.pose.pose.position.y = self.cur_y
+        # rospy.loginfo('  %s: %s', str(self.odom_msg.pose.pose.position.x), str(self.odom_msg.pose.pose.position.y))
+        q = tf_conversions.transformations.quaternion_from_euler(0.0, 0.0, self.cur_theta)
+        self.odom_msg.pose.pose.orientation.z = q[2]  # math.sin(self.theta)/2
+        self.odom_msg.pose.pose.orientation.w = q[3]  # math.cos(self.theta)/2
 
-            # self.odom_msg.pose.covariance
+        # self.odom_msg.pose.covariance
 
-            self.tf_msg.transform.translation.x = self.cur_x
-            self.tf_msg.transform.translation.y = self.cur_y
-            self.tf_msg.transform.rotation.z = q[2]
-            self.tf_msg.transform.rotation.w = q[3]
+        self.tf_msg.transform.translation.x = self.cur_x
+        self.tf_msg.transform.translation.y = self.cur_y
+        self.tf_msg.transform.rotation.z = q[2]
+        self.tf_msg.transform.rotation.w = q[3]
 
-            # ... and publish!
-            self.odom_pub.publish(self.odom_msg)
-            self.tf_pub.sendTransform(self.tf_msg)
+        # ... and publish!
+        self.odom_pub.publish(self.odom_msg)
+        self.tf_pub.sendTransform(self.tf_msg)
 
     def joint_angles(self):
         self.joint_state_msg.header.stamp = rospy.Time.now()
@@ -210,11 +201,9 @@ class ODriveNode(object):
         self.joint_state_publisher.publish(self.joint_state_msg)
 
     def publish(self, timer_event):
-        if self.left == 0 and self.right == 0:
-            self.ser_write(b'w axis0.controller.vel_setpoint {}\n'.format(self.right))
-            self.ser_write(b'w axis1.controller.vel_setpoint {}\n'.format(self.left))
-        self.odometry()
-        self.joint_angles()
+        if self.fast_timer_comms_active:
+            self.odometry()
+            self.joint_angles()
 
     def drive(self, data):
         L = 0.5
@@ -225,12 +214,12 @@ class ODriveNode(object):
         self.left = self.left / self.tyre_circumference * self.encoder_cpr * (-1.0)
         self.right = V + L / 2.0 * W
         self.right = self.right / self.tyre_circumference * self.encoder_cpr
-        self.ser_write(b'w axis0.controller.vel_setpoint {}\n'.format(self.right))
-        self.ser_write(b'w axis1.controller.vel_setpoint {}\n'.format(self.left))
+        self.driver_write(b'axis0.controller.vel_setpoint {}'.format(self.right))
+        self.driver_write(b'axis1.controller.vel_setpoint {}'.format(self.left))
 
     def terminate(self):
-        self.ser_write(b'w axis0.requested_state {}\n'.format(AXIS_STATE_IDLE))
-        self.ser_write(b'w axis1.requested_state {}\n'.format(AXIS_STATE_IDLE))
+        self.driver_write(b'axis0.requested_state {}'.format(AXIS_STATE_IDLE))
+        self.driver_write(b'axis1.requested_state {}'.format(AXIS_STATE_IDLE))
         self.ser.close()
 
     def run(self):
@@ -253,7 +242,7 @@ class ODriveNode(object):
         return value
 
     def ser_write(self, buf):
-        rospy.loginfo(buf + '\n')
+        # rospy.loginfo(buf + '\n')
         counter = 0
         size = len(buf)
         while (1):
@@ -262,6 +251,16 @@ class ODriveNode(object):
             if self.ser.writable():
                 self.ser.write(buf[counter])
                 counter = counter + 1
+
+    def driver_write(self, prop):
+        buf = b'w ' + prop + b'\n'
+        self.ser_write(buf)
+
+    def driver_read(self, prop):
+        buf = b'r ' + prop + b'\n'
+        self.ser_write(buf)
+        value = self.ser_read()
+        return value
 
 
 if __name__ == '__main__':
