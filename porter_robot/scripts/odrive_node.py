@@ -260,6 +260,8 @@ class ODriveNode(object):
         buf = b'r ' + prop + b'\n'
         self.ser_write(buf)
         value = self.ser_read()
+        if value == 'invalid property':
+            self.driver_read(prop)
         return value
 
 
