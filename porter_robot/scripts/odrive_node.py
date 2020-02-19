@@ -39,6 +39,8 @@ class ODriveNode(object):
     new_pos_r = 0
     old_pos_l = 0
     old_pos_r = 0
+    left = 0.0
+    right = 0.0
     driver = None
     ser = None
 
