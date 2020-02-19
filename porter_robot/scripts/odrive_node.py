@@ -20,7 +20,6 @@ def get_param(name, default):
 
 
 class ODriveNode(object):
-
     encoder_cpr = None
     tyre_circumference = None
     fast_timer_comms_active = False
@@ -57,13 +56,11 @@ class ODriveNode(object):
         self.joint_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=1)
 
         rospy.Service('reset_odometry', std_srvs.srv.Trigger, self.reset_odometry)
-	
 
         self.ser_write(b'r vbus_voltage\n')
         vbus_voltage = self.ser_read()
 
         rospy.loginfo("Current plate voltage: %s", vbus_voltage)
-        
 
         self.ser_write(b'w axis0.requested_state {}\n'.format(AXIS_STATE_CLOSED_LOOP_CONTROL))
         self.ser_write(b'w axis1.requested_state {}\n'.format(AXIS_STATE_CLOSED_LOOP_CONTROL))
@@ -147,7 +144,7 @@ class ODriveNode(object):
             # Twist/velocity: calculated from motor values only
             s = self.tyre_circumference * (left_vel + right_vel) / (2.0 * self.encoder_cpr)
             w = self.tyre_circumference * (right_vel - left_vel) / (
-                        self.wheel_track * self.encoder_cpr)  # angle: vel_r*tyre_radius - vel_l*tyre_radius
+                    self.wheel_track * self.encoder_cpr)  # angle: vel_r*tyre_radius - vel_l*tyre_radius
 
             self.odom_msg.twist.twist.linear.x = s
             self.odom_msg.twist.twist.angular.z = w
@@ -211,6 +208,9 @@ class ODriveNode(object):
         self.joint_state_publisher.publish(self.joint_state_msg)
 
     def publish(self, timer_event):
+        if self.left == 0 and self.right == 0:
+            self.ser_write(b'w axis0.controller.vel_setpoint {}\n'.format(self.right))
+            self.ser_write(b'w axis1.controller.vel_setpoint {}\n'.format(self.left))
         self.odometry()
         self.joint_angles()
 
@@ -219,13 +219,12 @@ class ODriveNode(object):
         # rospy.loginfo(rospy.get_caller_id() + "I heard: \n %s", data)
         V = data.linear.x
         W = data.angular.z
-        left = V - L / 2.0 * W
-        left = left / self.tyre_circumference * self.encoder_cpr * (-1.0)
-        right = V + L / 2.0 * W
-        right = right / self.tyre_circumference * self.encoder_cpr
-        self.ser_write(b'w axis0.controller.vel_setpoint {}\n'.format(right))
-        self.ser_write(b'w axis1.controller.vel_setpoint {}\n'.format(left))
-
+        self.left = V - L / 2.0 * W
+        self.left = self.left / self.tyre_circumference * self.encoder_cpr * (-1.0)
+        self.right = V + L / 2.0 * W
+        self.right = self.right / self.tyre_circumference * self.encoder_cpr
+        self.ser_write(b'w axis0.controller.vel_setpoint {}\n'.format(self.right))
+        self.ser_write(b'w axis1.controller.vel_setpoint {}\n'.format(self.left))
 
     def terminate(self):
         self.ser_write(b'w axis0.requested_state {}\n'.format(AXIS_STATE_IDLE))
@@ -245,17 +244,17 @@ class ODriveNode(object):
     def ser_read(self):
         c = ''
         value = ''
-	while not c =='\n':
+        while not c == '\n':
             value = value + c
             if self.ser.readable():
                 c = self.ser.read()
         return value
 
     def ser_write(self, buf):
-	rospy.loginfo(buf+'\n')
+        rospy.loginfo(buf + '\n')
         counter = 0
         size = len(buf)
-        while(1):
+        while (1):
             if counter >= size:
                 break
             if self.ser.writable():
