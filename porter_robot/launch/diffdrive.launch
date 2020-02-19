@@ -6,7 +6,7 @@
 
 	<arg name="rvizconfig" default="$(find porter_robot_simulation)/rviz/default.rviz" />
 	
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
+	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" /> -->
 	<!-- <param name="robot_description" command="xacro $(arg model)" /> -->
 	<param name="porter/robot_description" command="xacro $(arg model)" />
 
@@ -31,11 +31,12 @@
 	
 
 		<node pkg="porter_robot" type="odrive_node.py" name="odrive" output="screen" respawn="false">
-			<param name="wheel_track" 			 value="0.88"/>
-			<param name="tyre_circumference" 	 value="0.79796453401"/>
-			<param name="wheel_radius" 			 value="0.127"/>
+			<param name="wheel_track" 		     value="0.88"/>
+			<param name="tyre_circumference" 	     value="0.79796453401"/>
+			<param name="wheel_radius" 		     value="0.127"/>
 			<param name="base_frame"		     value="chasiss"/>
 			<param name="odom_frame"		     value="odom"/>
+			<param name="odom_calc_hz"		     value="20.0" />
 		</node>
     
     <!--	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
