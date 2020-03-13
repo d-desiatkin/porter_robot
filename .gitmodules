@@ -11,3 +11,6 @@
 [submodule "ouster-for-diploma"]
 	path = ouster-for-diploma
 	url = https://github.com/d-desiatkin/ouster-for-diploma.git
+[submodule "ouster"]
+	path = ouster
+	url = https://github.com/d-desiatkin/ouster.git
