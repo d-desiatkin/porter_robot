@@ -12,7 +12,13 @@ fi
 # Install light weight dns server for small networks.
 # If I am not mistaken it will launch with error after installation.
 
-sudo apt install dnsmasq
+if sudo apt install dnsmasq; then
+	sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.example
+	sudo touch /etc/dnsmasq.conf
+else
+	sudo rm /etc/dnsmasq.conf
+	sudo touch /etc/dnsmasq.conf
+fi
 
 # Configure dns server. Later it should be replaced with regular expressions.
 sudo echo "port=53" >> /etc/dnsmasq.conf
@@ -34,6 +40,7 @@ sudo echo "10.5.5.80	os1-991936000848" >> /etc/hosts
 # Modification of standart network manager that described in ouster vendor documentation
 # Here we assign constant ip to ethernet interface.
 # It is required for proper work of dhcp server
+sudo rm /etc/network/interfaces.d/eth0
 sudo touch /etc/network/interfaces.d/eth0
 sudo echo "auto lo eth0" >> /etc/network/interfaces.d/eth0
 sudo echo "iface lo inet loopback" >> /etc/network/interfaces.d/eth0
@@ -42,8 +49,13 @@ sudo echo "	address 10.5.5.1" >> /etc/network/interfaces.d/eth0
 sudo echo "	netmask 255.255.255.0" >> /etc/network/interfaces.d/eth0
 
 # restart dns server with new configuration.
-sudo systemctl restart NetworkManager
-sudo systemctl restart dnsmasq
+read -p "To finalize the installation reboot is needed.$'\n' Do you want to reboot now?" -r
+echo    # (optional) move to a new line
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+	sudo init 6
+	[[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+fi
 
 
 
