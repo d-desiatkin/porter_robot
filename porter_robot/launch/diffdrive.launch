@@ -4,7 +4,7 @@
 
 	<arg name="model" default="$(find porter_robot_model)/xacro/model.xacro"/>
 
-	<arg name="rvizconfig" default="$(find porter_robot_simulation)/rviz/default.rviz" />
+	<arg name="rvizconfig" default="$(find porter_robot)/rviz/default.rviz" />
 	
 	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" /> -->
 	<!-- <param name="robot_description" command="xacro $(arg model)" /> -->

@@ -49,7 +49,7 @@ sudo echo "	address 10.5.5.1" >> /etc/network/interfaces.d/eth0
 sudo echo "	netmask 255.255.255.0" >> /etc/network/interfaces.d/eth0
 
 # restart dns server with new configuration.
-read -p "To finalize the installation reboot is needed.$'\n' Do you want to reboot now?" -r
+read -p "To finalize the installation reboot is needed.$'\n' Do you want to reboot now?" -n 1 -r
 echo    # (optional) move to a new line
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
