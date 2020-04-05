@@ -14,6 +14,12 @@
 	path = cartographer
 	url = https://github.com/googlecartographer/cartographer.git
 
+[submodule "ceres-solver"]
+	path = ceres-solver
+	url = https://ceres-solver.googlesource.com/ceres-solver.git
+
 [submodule "orb_slam_2_ros"]
 	path = orb_slam_2_ros
 	url = https://github.com/appliedAI-Initiative/orb_slam_2_ros.git
+
+

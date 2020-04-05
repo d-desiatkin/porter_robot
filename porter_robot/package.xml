@@ -54,8 +54,6 @@
   <depend>rospy</depend>
   <depend>std_msgs</depend>
   <depend>porter_robot_model</depend>
-  <depend>porter_robot_simulation</depend>
-  <depend>orb_slam_2_ros</depend>
   <exec_depend>roslaunch</exec_depend>
   <exec_depend>joint_state_publisher</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
