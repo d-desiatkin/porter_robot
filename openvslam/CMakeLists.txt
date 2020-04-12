@@ -80,7 +80,7 @@ find_package(yaml-cpp REQUIRED)
 
 # OpenCV
 
-set(OpenCV_DIR /home/robotics/opencv/3.4.9)
+set(OpenCV_DIR /usr/local/)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 #target_link_libraries(Program ${OpenCV_LIBS})
