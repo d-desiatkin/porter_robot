@@ -49,11 +49,13 @@ class Synchronisation_node():
                         min_d = diff
                         ind_l = i
                         ind_r = j
+            #TODO Here image correction must be added.
             now = rospy.get_rostime()
             self.left[ind_l].header.stamp.secs = now.secs
             self.left[ind_l].header.stamp.nsecs = now.nsecs
             self.right[ind_r].header.stamp.secs = now.secs
             self.right[ind_r].header.stamp.nsecs = now.nsecs
+            #TODO Here we must publish simultaneously.
             self.left_pub.publish(self.left.pop(ind_l))
             self.right_pub.publish(self.right.pop(ind_r))
             del self.left[0:ind_l]
