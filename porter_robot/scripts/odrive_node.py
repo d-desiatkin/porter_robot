@@ -48,13 +48,13 @@ class ODriveNode(object):
 
     def __init__(self):
 
-        rospy.init_node('odrive', anonymous=False)
+        rospy.init_node('odrive_node', anonymous=False)
         rospy.Rate(20)
         rospy.on_shutdown(self.terminate)
         self.ser = serial.Serial('/dev/ttyTHS2', 115200)  # open serial port
         rospy.loginfo("Used port: %s", str(self.ser.name))
 
-        rospy.Subscriber("diff_drive_controller/cmd_vel", Twist, self.drive)
+        rospy.Subscriber("diff_drive_controller/cmd_vel", Twist, self.drive, queue_size=1)
         self.odom_pub = rospy.Publisher("diff_drive_controller/odom", Odometry, queue_size=1)
         self.tf_pub = tf2_ros.TransformBroadcaster()
         self.joint_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=1)
@@ -201,8 +201,8 @@ class ODriveNode(object):
             self.driver_write_vel(1, self.left_cmd)
             self.new_pos_r, self.right_vel = self.driver_read_enc(0)
             self.new_pos_l, self.left_vel = self.driver_read_enc(1)
-	    self.new_pos_l = -self.new_pos_l
-	    self.left_vel = -self.left_vel
+            self.new_pos_l = -self.new_pos_l
+            self.left_vel = -self.left_vel
             self.odometry()
             self.joint_angles()
 
