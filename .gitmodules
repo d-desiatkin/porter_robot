@@ -22,4 +22,8 @@
 	path = orb_slam_2_ros
 	url = https://github.com/appliedAI-Initiative/orb_slam_2_ros.git
 
+[submodule "realsense-ros"]
+	path = realsense-ros
+	url = https://github.com/IntelRealSense/realsense-ros.git
+
 
