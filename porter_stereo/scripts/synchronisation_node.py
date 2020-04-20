@@ -4,6 +4,7 @@ from Queue import Queue, Empty
 from sensor_msgs.msg import Image, CameraInfo
 from std_msgs.msg import String
 from numpy import abs
+import threading as th
 
 
 class Synchronisation_node():
@@ -13,6 +14,7 @@ class Synchronisation_node():
         self.right_queue = Queue(4)
         self.left = list()
         self.right = list()
+        self.threads = list()
         rospy.init_node("synchronisation_node")
         rospy.Subscriber("left/image_raw", Image, self.image_left_callback, queue_size=4)
         rospy.Subscriber("right/image_raw", Image, self.image_right_callback, queue_size=4)
@@ -37,7 +39,7 @@ class Synchronisation_node():
             self.right.append(self.right_queue.get())
         except Empty:
             pass
-        if len(self.right) >= 3 or len(self.left) >= 3:
+        if len(self.right) >= 2 and len(self.left) >= 2:
             min_d = 1.0
             ind_l = 0
             ind_r = 0
@@ -56,6 +58,10 @@ class Synchronisation_node():
             self.right[ind_r].header.stamp.secs = now.secs
             self.right[ind_r].header.stamp.nsecs = now.nsecs
             #TODO Here we must publish simultaneously.
+            # p1 = th.Thread(target=self.left_pub.publish, args=(self.left.pop(ind_l),))
+            # p2 = th.Thread(target=self.right_pub.publish, args=(self.right.pop(ind_r),))
+            # p1.start()
+            # p2.start()
             self.left_pub.publish(self.left.pop(ind_l))
             self.right_pub.publish(self.right.pop(ind_r))
             del self.left[0:ind_l]

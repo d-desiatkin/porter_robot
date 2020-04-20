@@ -1,16 +1,31 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import rospy
-from geometry_msgs.msg import Twist, TransformStamped, Vector3
-import tf_conversions
-import tf2_ros
-from nav_msgs.msg import Odometry
-from sensor_msgs.msg import JointState
-import std_srvs.srv
-import odrive
-from odrive.enums import *
+
 import math
 import serial
+
+import rospy
+import std_srvs.srv
+import tf2_ros
+import tf_conversions
+from geometry_msgs.msg import TransformStamped, Twist, Vector3
+from nav_msgs.msg import Odometry
+from sensor_msgs.msg import JointState
+
+
+
+AXIS_STATE_UNDEFINED = 0
+AXIS_STATE_IDLE = 1
+AXIS_STATE_STARTUP_SEQUENCE = 2
+AXIS_STATE_FULL_CALIBRATION_SEQUENCE = 3
+AXIS_STATE_MOTOR_CALIBRATION = 4
+AXIS_STATE_SENSORLESS_CONTROL = 5
+AXIS_STATE_ENCODER_INDEX_SEARCH = 6
+AXIS_STATE_ENCODER_OFFSET_CALIBRATION = 7
+AXIS_STATE_CLOSED_LOOP_CONTROL = 8
+AXIS_STATE_LOCKIN_SPIN = 9
+AXIS_STATE_ENCODER_DIR_FIND = 10
+
 
 
 def get_param(name, default):
