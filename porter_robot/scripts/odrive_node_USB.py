@@ -59,7 +59,7 @@ class ODriveNode(object):
         self.odom_frame = get_param(nm + '/' + 'odom_frame', "odom")
         self.base_frame = get_param(nm + '/' + 'base_frame', "base_link")
         self.odom_calc_hz = float(get_param(nm + '/' + 'odom_calc_hz', 20.0))
-        self.odrive_serial_number = get_param(nm + '/' + 'odrive_serial_number', "35717877937480")
+        self.odrive_serial_number = get_param(nm + '/' + 'odrive_serial_number', None)
 
         self.driver = odrive.find_any(serial_number=self.odrive_serial_number)
         rospy.loginfo("Connected to ODrive with serial# : %s", str(self.driver.serial_number))

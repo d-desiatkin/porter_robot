@@ -18,7 +18,7 @@
 		</node>
 		
 		
-		<node pkg="porter_robot" type="odrive_node_UART.py" name="odrive" output="screen" respawn="false">
+		<node pkg="porter_robot" type="odrive_node_USB.py" name="odrive" output="screen" respawn="false">
 			<param name="wheel_track" 		     value="0.88"/>
 			<param name="tyre_circumference" 	     value="0.79796453401"/>
 			<param name="wheel_radius" 		     value="0.127"/>
