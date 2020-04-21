@@ -12,25 +12,13 @@
 
 	<group ns="porter">
 		
-		<include file="$(find ouster_driver)/launch/os1.launch">
-			<arg name="lidar_address" value="10.5.5.80" />
-			<arg name="node_name" value="os1_cloud_node" />
-			<arg name="pc_address" value="10.5.5.1" />
-			<arg name="pointcloud_mode" value="NATIVE" />
-			<arg name="lidar_frame_name" value="os1_sensor" />
-			<arg name="lidar_topic_name" value="/porter/os1_cloud_node/points" />
-			<arg name="imu_frame_name" value="os1_imu" />
-			<arg name="imu_topic_name" value="/porter/os1_cloud_node/imu" />
-			<arg name="operation_mode" value="1024x20" />
-			<arg name="window_rejection" value="" />
-		</include>
 		
 		<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
 			<param name="publish_frequency" type="double" value="50.0" />
 		</node>
-	
-
-		<node pkg="porter_robot" type="odrive_node.py" name="odrive" output="screen" respawn="false">
+		
+		
+		<node pkg="porter_robot" type="odrive_node_UART.py" name="odrive" output="screen" respawn="false">
 			<param name="wheel_track" 		     value="0.88"/>
 			<param name="tyre_circumference" 	     value="0.79796453401"/>
 			<param name="wheel_radius" 		     value="0.127"/>
@@ -38,7 +26,9 @@
 			<param name="odom_frame"		     value="odom"/>
 			<param name="odom_calc_hz"		     value="20.0" />
 		</node>
-    
+		    		
+		
+			
     <!--	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
 			<param name="default_topic" value="/porter/cmd_vel"/>
 		</node>

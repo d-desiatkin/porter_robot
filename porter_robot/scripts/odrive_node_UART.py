@@ -63,7 +63,6 @@ class ODriveNode(object):
     def __init__(self):
 
         rospy.init_node('odrive_node', anonymous=False)
-        rospy.Rate(20)
         rospy.on_shutdown(self.terminate)
         self.ser = serial.Serial('/dev/ttyTHS2', 115200)  # open serial port
         rospy.loginfo("Used port: %s", str(self.ser.name))
@@ -222,7 +221,7 @@ class ODriveNode(object):
 
     def drive(self, data):
         L = 0.5
-        rospy.loginfo(rospy.get_caller_id() + "I heard: \n %s", data)
+        # rospy.loginfo(rospy.get_caller_id() + "I heard: \n %s", data)
         V = data.linear.x
         W = data.angular.z
         self.left_cmd = V - self.wheel_track / 2.0 * W
