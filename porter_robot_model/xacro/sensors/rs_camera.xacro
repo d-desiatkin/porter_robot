@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+	<xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro"/>
+
+	<xacro:if value="$(arg rs_camera)">
+		<xacro:sensor_d435 parent="left_camera_support" name="rs_camera">
+			<origin xyz="0.05 0.0 0.19"/>
+		</xacro:sensor_d435>
+	</xacro:if>
+	
+</robot>

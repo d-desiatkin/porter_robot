@@ -4,37 +4,49 @@
   
   <!-- <xacro:macro name="OS1-64" params=" name:=  hz:=10 lasers:=64 samples:=512 min_range:=0.9 max_range:=75.0 noise:=0.008 min_angle:=-${M_PI} max_angle:=${M_PI}"> -->
 
-    <joint name="mount_joint" type="fixed">
-      <origin xyz="${lidar_posx} ${lidar_posy} ${support_height/2 + 0.073/2 + lidar_posz}" rpy="0 0 0"/>
-      <parent link="support"/>
-      <child link="os1_sensor"/>
-    </joint>
+	<joint name="mount_joint" type="fixed">
+	  <origin xyz="${lidar_posx} ${lidar_posy} ${support_height/2 + 0.073/2 + lidar_posz}" rpy="0 0 0"/>
+	  <parent link="support"/>
+	  <child link="os1_sensor"/>
+	</joint>
 
-    <link name="os1_sensor">
-      <inertial>
-         <mass value="0.33"/>
-         <origin xyz="0 0 0.0365" rpy="0 0 0" />
-         <inertia ixx="0.000241148" ixy="0" ixz="0"
-          iyy="0.000241148" iyz="0" izz="0.000264"/>
-      </inertial>
-      <collision name="base_collision">
-         <origin xyz="0 0 0.0365" rpy="0 0 0" />
-         <geometry>
- 	        <cylinder radius="0.04" length="0.073"/>
-         </geometry>
-      </collision>
-      <visual name="base_visual">
-         <origin xyz="0 0 0.0" rpy="0 0 1.5707" />
-         <geometry>
-	         <mesh filename="package://porter_robot_model/meshes/os1_64.dae" /> 
-           <!-- <cylinder length="0.073" radius="0.04" /> -->
-         </geometry>
-      </visual>
-    </link>
+	<link name="os1_sensor">
+	  <inertial>
+		 <mass value="0.33"/>
+		 <origin xyz="0 0 0.0365" rpy="0 0 0" />
+		 <inertia ixx="0.000241148" ixy="0" ixz="0"
+		  iyy="0.000241148" iyz="0" izz="0.000264"/>
+	  </inertial>
+	  <collision>
+		 <origin xyz="0 0 0.0365" rpy="0 0 0" />
+		 <geometry>
+		    <cylinder radius="0.04" length="0.073"/>
+		 </geometry>
+	  </collision>
+	  <visual>
+		 <origin xyz="0 0 0.0" rpy="0 0 1.5707" />
+		 <geometry>
+		     <mesh filename="package://porter_robot_model/meshes/os1_64.dae" /> 
+		   <!-- <cylinder length="0.073" radius="0.04" /> -->
+		 </geometry>
+	  </visual>
+	</link>
 
-    <link name="os1_imu" />
+	<link name="os1_imu">
+		<collision>
+			<geometry>
+				<box size="0.00 0.00 0.0"/>
+			</geometry>
+		</collision>
+	</link>
 
-    <link name="os1_lidar" />
+    <link name="os1_lidar">
+		<collision>
+			<geometry>
+				<box size="0.00 0.00 0.0"/>
+			</geometry>
+		</collision>
+	</link>
 
 
     <joint name="imu_link_joint" type="fixed">

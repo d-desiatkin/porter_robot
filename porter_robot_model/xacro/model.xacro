@@ -5,6 +5,7 @@
 	<xacro:include filename="$(find porter_robot_model)/xacro/gazebo_ref.xacro"/>
 	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/camera_main.xacro"/>
 	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/OS1-64.urdf.xacro"/>
+	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/rs_camera.xacro"/>
 
 	<!-- Here actual model begins -->
 	<link name="${base_name}">
@@ -41,10 +42,55 @@
 		<xacro:ch_inertial mass="${support_mass}" length="${support_length}" width="${support_width}" thickness="${support_height}"/>
 	</link>
 	
+	<link name="left_camera_support">
+		<visual>
+			<geometry>
+				<box size="0.03 0.03 0.30"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="blue"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="0.03 0.03 0.30"/>
+			</geometry>
+		</collision>
+		<xacro:ch_inertial mass="0.1" length="0.03" width="0.03" thickness="0.30"/>
+	</link>
+	
+	<link name="right_camera_support">
+		<visual>
+			<geometry>
+				<box size="0.03 0.03 0.30"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="blue"/>
+		</visual>
+		<collision>
+			<geometry>
+				<box size="0.03 0.03 0.30"/>
+			</geometry>
+		</collision>
+		<xacro:ch_inertial mass="0.1" length="0.03" width="0.03" thickness="0.30"/>
+	</link>
+
+	
 	<joint name="${base_name}_to_support" type="fixed">
 		<parent link="${base_name}"/>
 		<child link="support"/>
 		<origin rpy="0 0 0" xyz="0.28 0.0 ${(support_height/2+base_thickness/2)}"/>
+	</joint>
+	
+	<joint name="${base_name}_to_left_camera_support" type="fixed">
+		<parent link="${base_name}"/>
+		<child link="left_camera_support"/>
+		<origin rpy="0 0 0" xyz="0.33 0.265 ${(0.3/2+base_thickness/2)}"/>
+	</joint>
+	
+	<joint name="${base_name}_to_right_camera_support" type="fixed">
+		<parent link="${base_name}"/>
+		<child link="right_camera_support"/>
+		<origin rpy="0 0 0" xyz="0.33 -0.265 ${(0.3/2+base_thickness/2)}"/>
 	</joint>
  	
 	<xacro:actuated_wheel prefix="right">

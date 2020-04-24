@@ -1,14 +1,26 @@
 <launch>
+
+	<arg name="publish_odom_tf" default="True" />
+
 	<!-- This needed due to bug in rviz visualization on melodic. When bug is fixed line below could be deleted -->
 	<env name="LC_NUMERIC" value="en_US.UTF-8" />
+	
 
+	<!-- Here block of arguments related to model spawn -->
+	<!--############################################################################################-->
 	<arg name="model" default="$(find porter_robot_model)/xacro/model.xacro"/>
+	<arg name="rs_camera" default="true"/>
+	<arg name="use_nominal_extrinsics" default="false"/>
+
+	<param name="porter/robot_description" command="$(find xacro)/xacro.py $(arg model) rs_camera:=$(arg rs_camera)
+						use_nominal_extrinsics:=$(arg use_nominal_extrinsics)" />
+	<!--############################################################################################-->
+
 
 	<arg name="rvizconfig" default="$(find porter_robot)/rviz/default.rviz" />
 	
 	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" /> -->
-	<!-- <param name="robot_description" command="xacro $(arg model)" /> -->
-	<param name="porter/robot_description" command="xacro $(arg model)" />
+
 
 	<group ns="porter">
 		
@@ -18,18 +30,19 @@
 		</node>
 		
 		
-		<node pkg="porter_robot" type="odrive_node_USB.py" name="odrive" output="screen" respawn="false">
+		<node pkg="porter_robot" type="odrive_node_UART.py" name="odrive" output="screen" respawn="false">
 			<param name="wheel_track" 		     value="0.88"/>
 			<param name="tyre_circumference" 	     value="0.79796453401"/>
 			<param name="wheel_radius" 		     value="0.127"/>
 			<param name="base_frame"		     value="chasiss"/>
 			<param name="odom_frame"		     value="odom"/>
 			<param name="odom_calc_hz"		     value="20.0" />
+			<param name="publish_odom_tf"		     value="$(arg publish_odom_tf)" />
 		</node>
 		    		
 		
 			
-    <!--	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
+    	<!--	<node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering">
 			<param name="default_topic" value="/porter/cmd_vel"/>
 		</node>
 	-->

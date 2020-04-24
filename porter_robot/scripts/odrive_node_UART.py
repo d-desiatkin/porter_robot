@@ -42,6 +42,7 @@ class ODriveNode(object):
     wheel_track = None
     odom_msg = Odometry()
     tf_msg = TransformStamped()
+    publish_odom_tf = None
     odom_frame = None
     base_frame = None
     odom_pub = None
@@ -64,10 +65,10 @@ class ODriveNode(object):
 
         rospy.init_node('odrive_node', anonymous=False)
         rospy.on_shutdown(self.terminate)
-        self.ser = serial.Serial('/dev/ttyTHS2', 115200)  # open serial port
+        self.ser = serial.Serial('/dev/ttyTHS2', 115200, timeout= None, bytesize=8)  # open serial port
         rospy.loginfo("Used port: %s", str(self.ser.name))
 
-        rospy.Subscriber("diff_drive_controller/cmd_vel", Twist, self.drive)
+        rospy.Subscriber("diff_drive_controller/cmd_vel", Twist, self.get_cmd_vel)
         self.odom_pub = rospy.Publisher("diff_drive_controller/odom", Odometry, queue_size=1)
         self.tf_pub = tf2_ros.TransformBroadcaster()
         self.joint_state_publisher = rospy.Publisher('joint_states', JointState, queue_size=1)
@@ -95,6 +96,7 @@ class ODriveNode(object):
         self.tyre_circumference = float(get_param(nm + '/' + 'tyre_circumference', 0.0))
         self.wheel_radius = float(get_param(nm + '/' + 'wheel_radius', 0.127))
         self.wheel_track = float(get_param(nm + '/' + 'wheel_track', 0.88))
+        self.publish_odom_tf = get_param(nm + '/' + 'publish_odom_tf', True)
         self.odom_frame = get_param(nm + '/' + 'odom_frame', "odom")
         self.base_frame = get_param(nm + '/' + 'base_frame', "base_link")
         self.odom_calc_hz = float(get_param(nm + '/' + 'odom_calc_hz', 20.0))
@@ -199,7 +201,8 @@ class ODriveNode(object):
 
         # ... and publish!
         self.odom_pub.publish(self.odom_msg)
-        self.tf_pub.sendTransform(self.tf_msg)
+        if self.publish_odom_tf:
+            self.tf_pub.sendTransform(self.tf_msg)
 
     def joint_angles(self):
         self.joint_state_msg.header.stamp = rospy.Time.now()
@@ -208,19 +211,23 @@ class ODriveNode(object):
             self.joint_state_msg.position[1] = 2 * math.pi * self.new_pos_r / self.encoder_cpr
         self.joint_state_publisher.publish(self.joint_state_msg)
 
+    def driver_info_exchange(self):
+
+        self.driver_write_vel(0, self.right_cmd)
+        self.driver_write_vel(1, self.left_cmd)
+        self.new_pos_r, self.right_vel = self.driver_read_enc(0)
+        self.new_pos_l, self.left_vel = self.driver_read_enc(1)
+
+
     def publish(self, timer_event):
         if self.fast_timer_comms_active:
-            self.driver_write_vel(0, self.right_cmd)
-            self.driver_write_vel(1, self.left_cmd)
-            self.new_pos_r, self.right_vel = self.driver_read_enc(0)
-            self.new_pos_l, self.left_vel = self.driver_read_enc(1)
+            self.driver_info_exchange()
             self.new_pos_l = -self.new_pos_l
             self.left_vel = -self.left_vel
             self.odometry()
             self.joint_angles()
 
-    def drive(self, data):
-        L = 0.5
+    def get_cmd_vel(self, data):
         # rospy.loginfo(rospy.get_caller_id() + "I heard: \n %s", data)
         V = data.linear.x
         W = data.angular.z
@@ -247,53 +254,44 @@ class ODriveNode(object):
         self.cur_theta = 0.0
         return (True, "Odometry reset.")
 
-    def ser_read(self):
-        c = ''
-        value = ''
-        while not c == '\n':
-            value = value + c
-            if self.ser.readable():
-                c = self.ser.read()
-        return value
-
-    def ser_write(self, buf):
-        # rospy.loginfo(buf + '\n')
-        counter = 0
-        size = len(buf)
-        while (1):
-            if counter >= size:
-                break
-            if self.ser.writable():
-                self.ser.write(buf[counter])
-                counter = counter + 1
-
     def driver_write(self, prop):
         buf = b'w ' + prop + b'\n'
-        self.ser_write(buf)
+        self.ser.write(buf)
 
     def driver_write_vel(self, axis, vel):
         buf = b'v ' + str(axis) + ' ' + str(vel) + b'\n'
-        self.ser_write(buf)
+        self.ser.write(buf)
 
     def driver_read(self, prop):
         buf = b'r ' + prop + b'\n'
-        self.ser_write(buf)
-        value = self.ser_read()
-        
-        if (not value.find('invalid') == -1) or (not value.find('unknown') == -1):
+        self.ser.write(buf)
+        value = self.ser.readline()
+        if (not value.find('invalid') == -1) or (not value.find('unknown') == -1) or (not value.find('implemented') == -1):
             value = self.driver_read(prop)
         
         return value
 
     def driver_read_enc(self, axis):
         buf = b'f ' + str(axis) + b'\n'
-        self.ser_write(buf)
-        value = self.ser_read()
+        self.ser.write(buf)
+        value = self.ser.readline()
         try:
             pos, vel = value.split(' ') 
         except:
             pos, vel = self.driver_read_enc(axis)
-        return float(pos), float(vel)
+        try:
+            pos = float(pos)
+            vel = float(vel)
+        except:
+            rospy.loginfo("Odom message corrupted: {} {}".format(pos, vel))
+            return None, None
+        return pos, vel
+    
+    def driver_port_debug(self):
+        self.ser.cancel_read()
+        self.ser.cancel_write()
+        self.ser.flush()
+
 
 
 if __name__ == '__main__':
