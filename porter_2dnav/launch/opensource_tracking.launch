@@ -7,58 +7,90 @@
 			file="$(find realsense2_camera)/launch/rs_camera.launch">
 
 			<arg name="camera"	value="rs_camera"/>
+
+			<arg name="enable_color"        value="true"/>
+			<arg name="enable_fisheye"	value="false"/>
+			<arg name="enable_depth"        value="true"/>
+			<arg name="enable_gyro"         value="true"/>
+			<arg name="enable_accel"        value="true"/>
+			<arg name="enable_infra1"       value="false"/>
+			<arg name="enable_infra2"       value="false"/>
+
+			<arg name="color_width"         default="640"/>
+			<arg name="color_height"        default="480"/>
+			<arg name="depth_width"         default="640"/>
+			<arg name="depth_height"        default="480"/>
+			<arg name="gyro_fps"            value="400"/>
+			<arg name="accel_fps"           value="250"/>
+
 			<arg name="align_depth"	value="true"/>
 			<arg name="linear_accel_cov"	value="1.0"/>
 			<arg name="unite_imu_method"	value="linear_interpolation"/>
-			<arg name="enable_fisheye"	value="false"/>
-			<arg name="enable_depth"        value="true"/>
-		</include>
-		
-		<node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
-		    <param name="use_mag" type="bool" value="false" />
-		    <param name="_publish_tf" type="bool" value="false" />
-		    <param name="_world_frame" type="string" value="enu" />
-		    <remap from="/porter/imu/data_raw" to="/porter/rs_camera/imu"/>
+			</include>
+
+			<node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter">
+			<param name="use_mag" type="bool" value="false" />
+			<param name="_publish_tf" type="bool" value="false" />
+			<param name="_world_frame" type="string" value="enu" />
+			<remap from="/porter/imu/data_raw" to="/porter/rs_camera/imu"/>
 		</node>
 
 
 		<include file="$(find rtabmap_ros)/launch/rtabmap.launch">
-		    <arg name="args" value="-delete_db_on_start"/>
-		    <arg name="frame_id" value="chasiss" />
-		    <arg name="rgb_topic" value="/rs_camera/color/image_raw"/>
-		    <arg name="depth_topic" value="/rs_camera/aligned_depth_to_color/image_raw"/>
-		    <arg name="camera_info_topic" value="/rs_camera/color/camera_info"/>
-		    <arg name="depth_camera_info_topic" value="/rs_camera/depth/camera_info"/>
-		    <arg name="rtabmapviz" value="false"/>
-		    <arg name="rviz" value="true"/>
+			<arg name="args" value="--delete_db_on_start"/>
+			<arg name="frame_id" value="chasiss" />
+			<arg name="rgb_topic" value="/porter/rs_camera/color/image_raw"/>
+			<arg name="depth_topic" value="/porter/rs_camera/aligned_depth_to_color/image_raw"/>
+			<arg name="camera_info_topic" value="/porter/rs_camera/color/camera_info"/>
+			<arg name="depth_camera_info_topic" value="/porter/rs_camera/depth/camera_info"/>
+			<arg name="rtabmapviz" value="false"/>
+			<arg name="rviz" value="true"/>
 		</include>
+		
+		<node pkg="nodelet" type="nodelet" name="nodelet_manager"  args="manager"/>
 
+		<!-- Generate a point cloud from the depth image -->
+		<node pkg="nodelet" type="nodelet" name="rgbd2cloud" args="load rtabmap_ros/point_cloud_xyzrgb nodelet_manager __name:=rgbd2cloud">
+			 <remap from="rgb/image"       to="rs_camera/color/image_raw"/>
+			 <remap from="depth/image"       to="rs_camera/aligned_depth_to_color/image_raw"/>
+			 <remap from="rgb/camera_info" to="rs_camera/color/camera_info"/>
+			 <remap from="cloud"                to="cloudXYZ"/>
+			 
+			 <param name="voxel_size" type="double" value="0.05"/>
+			 <param name="decimation" type="int" value="4"/>
+			 <param name="max_depth" type="double" value="4"/>
+		</node>
 
-		<include file="$(find robot_localization)/launch/ukf_template.launch"/>
-		<param name="/ukf_se/frequency" value="300"/>
-		<param name="/ukf_se/base_link_frame" value="chasiss"/>
-		<param name="/ukf_se/odom0" value="rtabmap/odom"/>
-                <rosparam param="/ukf_se/odom0_config">[true,true,true,
-                                                        true,true,true,
-                                                        true,true,true,
-                                                        true,true,true,
-                                                        true,true,true]
-                </rosparam>
-		<param name="/ukf_se/odom0_relative" value="true"/>
-		<param name="/ukf_se/odom0_pose_rejection_threshold" value="10000000"/>
-		<param name="/ukf_se/odom0_twist_rejection_threshold" value="10000000"/>
+		<node pkg="nodelet" type="nodelet" name="obstacles_detection" args="load rtabmap_ros/obstacles_detection nodelet_manager __name:=cloud2planner">
+			<remap from="cloud" to="cloudXYZ"/>
+			<remap from="proj_obstacles" to="planner_cloud"/>
 
-		<param name="/ukf_se/imu0" value="/porter/imu/data"/>
-                <rosparam param="/ukf_se/imu0_config">[false, false, false,
-                                                       true,  true,  true,
-                                                       true,  true,  true,
-                                                       true,  true,  true,
-                                                       true,  true,  true]
-                </rosparam>
-		<param name="/ukf_se/imu0_differential" value="true"/>
-		<param name="/ukf_se/imu0_relative" value="false"/>
-		<param name="/ukf_se/use_control" value="false"/>
+			<param name="frame_id" type="string" value="chasiss"/>
+			<param name="map_frame_id" type="string" value="map"/>
+			<param name="min_cluster_size" type="int" value="20"/>
+			<param name="max_obstacles_height" type="double" value="0.0"/>
+		</node>
+
+		<node pkg="robot_localization" type="ukf_localization_node" name="ukf_se" clear_params="true">
+			<rosparam command="load" file="$(find porter_2dnav)/config/opensource_tracking/ukf_params.yaml" />
+
+			<!--  Placeholder for output topic remapping
+			<remap from="odometry/filtered" to=""/>
+			<remap from="accel/filtered" to=""/>
+			-->
+		</node>
+		
+		<node pkg="move_base" type="move_base" name="move_base">
+			<rosparam file="$(find porter_2dnav)/config/opensource_tracking/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+			<rosparam file="$(find porter_2dnav)/config/opensource_tracking/costmap_common_params.yaml" command="load" ns="local_costmap" />
+			<rosparam file="$(find porter_2dnav)/config/opensource_tracking/local_costmap_params.yaml" command="load" />
+			<rosparam file="$(find porter_2dnav)/config/opensource_tracking/global_costmap_params.yaml" command="load" /> 
+			<rosparam file="$(find porter_2dnav)/config/opensource_tracking/base_local_planner_params.yaml" command="load" />
+			<remap from="cmd_vel" to="/porter/diff_drive_controller/cmd_vel" />
+			<remap from="odom" to="/porter/diff_drive_controller/odom" />
+			<remap from="map" to="/porter/rtabmap/proj_map"/>
+		</node>
 
 	</group>
-    <!-- <param name="/ukf_se/odom0_config" value="{true,true,true,}"/> -->
+
 </launch>

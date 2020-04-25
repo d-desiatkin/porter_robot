@@ -57,11 +57,6 @@ class Synchronisation_node():
             self.left[ind_l].header.stamp.nsecs = now.nsecs
             self.right[ind_r].header.stamp.secs = now.secs
             self.right[ind_r].header.stamp.nsecs = now.nsecs
-            #TODO Here we must publish simultaneously.
-            # p1 = th.Thread(target=self.left_pub.publish, args=(self.left.pop(ind_l),))
-            # p2 = th.Thread(target=self.right_pub.publish, args=(self.right.pop(ind_r),))
-            # p1.start()
-            # p2.start()
             self.left_pub.publish(self.left.pop(ind_l))
             self.right_pub.publish(self.right.pop(ind_r))
             del self.left[0:ind_l]

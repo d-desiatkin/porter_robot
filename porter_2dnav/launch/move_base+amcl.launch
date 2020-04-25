@@ -49,11 +49,11 @@
 	</node>
 
 	<node pkg="move_base" type="move_base" name="move_base" ns="porter">
-		<rosparam file="$(find porter_2dnav)/config/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
-		<rosparam file="$(find porter_2dnav)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
-		<rosparam file="$(find porter_2dnav)/config/local_costmap_params.yaml" command="load" />
-		<rosparam file="$(find porter_2dnav)/config/global_costmap_params.yaml" command="load" /> 
-		<rosparam file="$(find porter_2dnav)/config/base_local_planner_params.yaml" command="load" />
+		<rosparam file="$(find porter_2dnav)/config/move_base+amcl/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
+		<rosparam file="$(find porter_2dnav)/config/move_base+amcl/costmap_common_params.yaml" command="load" ns="local_costmap" />
+		<rosparam file="$(find porter_2dnav)/config/move_base+amcl/local_costmap_params.yaml" command="load" />
+		<rosparam file="$(find porter_2dnav)/config/move_base+amcl/global_costmap_params.yaml" command="load" /> 
+		<rosparam file="$(find porter_2dnav)/config/move_base+amcl/base_local_planner_params.yaml" command="load" />
 		<remap from="/porter/porter/os1_cloud_node/scan" to="/porter/os1_cloud_node/scan" />
 		<remap from="cmd_vel" to="/porter/diff_drive_controller/cmd_vel" />
 		<remap from="odom" to="/porter/diff_drive_controller/odom" />
