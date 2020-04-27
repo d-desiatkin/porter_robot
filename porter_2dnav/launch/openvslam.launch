@@ -7,11 +7,10 @@
 	<remap from="/scan" to="$(arg scan_topic)" />
 	</node>
 	
-	<param name="use_sim_time" value="true"/>
-	
-	<master auto="start"/>
+	<param name="use_sim_time" value="false"/>
 
-	<node pkg="openvslam" type="run_slam" name="openvslam" args="-v /path/to/orb_vocab.dbow2 ">
+	<node pkg="openvslam" type="run_slam" name="openvslam" args="-v $(find openvslam)/../../config/orb_vocab.dbow2  -c $(find openvslam)/../../config/test.yaml ">
+		<remap from="camera/image_raw" to="right/image_raw" />
 		
 	</node>
 
