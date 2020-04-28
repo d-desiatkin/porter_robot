@@ -1,0 +1,26 @@
+image_width: 2048
+image_height: 1536
+camera_name: CNS-CWC6:U79085000764
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [ 1826.14058,     0.     ,  1112.04449,
+             0.     ,  1823.77275,   724.74688,
+             0.     ,     0.     ,     1.     ]
+distortion_model: rational_polynomial
+distortion_coefficients:
+  rows: 1
+  cols: 8
+  data: [-3.129196, 2.632868, 0.002026, -0.000427, 0.595264, -2.673893, 1.120670, 2.079026]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [ 1.,  0.,  0.,
+          0.,  1.,  0.,
+          0.,  0.,  1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [ 1529.30432,     0.     ,  1146.4089 ,     0.     ,
+             0.     ,  1665.30481,   718.71092,     0.     ,
+             0.     ,     0.     ,     1.     ,     0.     ]
