@@ -1,13 +1,19 @@
 [submodule "dragandbot_common"]
 	path = dragandbot_common
 	url = https://github.com/dragandbot/dragandbot_common.git
-[submodule "odrive_ros"]
-	path = odrive_ros
-	url = https://github.com/neomanic/odrive_ros.git
 
-[submodule "ODrive"]
-	path = ODrive
-	url = https://github.com/madcowswe/ODrive
-[submodule "ouster-for-diploma"]
-	path = ouster-for-diploma
-	url = https://github.com/d-desiatkin/ouster-for-diploma.git
+[submodule "ouster"]
+	path = ouster
+	url = https://github.com/d-desiatkin/ouster.git
+
+[submodule "cartographer_ros"]
+	path = cartographer_ros
+	url = https://github.com/googlecartographer/cartographer_ros.git
+
+[submodule "cartographer"]
+	path = cartographer
+	url = https://github.com/googlecartographer/cartographer.git
+
+[submodule "orb_slam_2_ros"]
+	path = orb_slam_2_ros
+	url = https://github.com/appliedAI-Initiative/orb_slam_2_ros.git
