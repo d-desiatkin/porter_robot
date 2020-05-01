@@ -1,0 +1,2 @@
+OpenCV-3.4.9-x86_64-docs.deb filter=lfs diff=lfs merge=lfs -text
+OpenCV-3.4.9-x86_64-libs.deb filter=lfs diff=lfs merge=lfs -text
