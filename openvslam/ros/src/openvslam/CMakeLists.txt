@@ -138,7 +138,7 @@ find_library(OpenVSLAM_LIB openvslam HINTS ${OpenVSLAM_LIB_DIR})
 
 # OpenCV
 set(OpenCV_DIR /home/robotics/opencv/3.4.9)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3.4.9 REQUIRED)
 
 #find_package(OpenCV 3.3.1 QUIET)
 #if(NOT OpenCV_FOUND)

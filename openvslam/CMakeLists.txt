@@ -81,7 +81,7 @@ find_package(yaml-cpp REQUIRED)
 # OpenCV
 
 set(OpenCV_DIR /usr/local/)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 3.4.9 REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 #target_link_libraries(Program ${OpenCV_LIBS})
 

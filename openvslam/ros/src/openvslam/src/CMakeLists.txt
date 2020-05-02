@@ -11,6 +11,9 @@ set(EXECUTABLE_TARGETS "")
 add_executable(run_slam run_slam.cc)
 list(APPEND EXECUTABLE_TARGETS run_slam)
 
+add_executable(my_impl my_impl.cpp)
+list(APPEND EXECUTABLE_TARGETS my_impl)
+
 add_executable(run_localization run_localization.cc)
 list(APPEND EXECUTABLE_TARGETS run_localization)
 
