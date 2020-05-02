@@ -1,0 +1,50 @@
+<launch>
+
+	<include file="$(find realsense2_camera)/launch/rs_camera.launch">
+
+		<arg name="camera"	value="rs_camera"/>
+
+		<arg name="enable_color"        value="true"/>
+		<arg name="enable_fisheye"	value="false"/>
+		<arg name="enable_depth"        value="true"/>
+		<arg name="enable_gyro"         value="true"/>
+		<arg name="enable_accel"        value="true"/>
+		<arg name="enable_infra1"       value="false"/>
+		<arg name="enable_infra2"       value="false"/>
+
+		<arg name="color_width"         default="640"/>
+		<arg name="color_height"        default="480"/>
+		<arg name="depth_width"         default="640"/>
+		<arg name="depth_height"        default="480"/>
+		<arg name="gyro_fps"            value="400"/>
+		<arg name="accel_fps"           value="250"/>
+
+		<arg name="align_depth"	value="true"/>
+		<arg name="linear_accel_cov"	value="1.0"/>
+		<arg name="unite_imu_method"	value="linear_interpolation"/>
+	</include>
+
+
+
+	<node name="orb_slam2_rgbd" pkg="orb_slam2_ros"
+		type="orb_slam2_ros_rgbd" output="screen">
+
+		<remap from="/camera/rgb/image_raw" to="/camera/color/image_rect_color" />
+		<remap from="/camera/depth_registered/image_raw" to="/camera/depth/image_rect_raw" />
+
+		<param name="publish_pointcloud" type="bool" value="true" />
+		<param name="publish_pose" type="bool" value="true" />
+		<param name="localize_only" type="bool" value="false" />
+		<param name="reset_map" type="bool" value="false" />
+
+		<!-- static parameters -->
+		<param name="load_map" type="bool" value="false" />
+		<param name="map_file" type="string" value="map.bin" />
+		<param name="settings_file" type="string" value="$(find orb_slam2_ros)/orb_slam2/config/RealSenseD435RGBD.yaml" />
+		<param name="voc_file" type="string" value="$(find orb_slam2_ros)/orb_slam2/Vocabulary/ORBvoc.txt" />
+
+		<param name="pointcloud_frame_id" type="string" value="map" />
+		<param name="camera_frame_id" type="string" value="rs_camera_link" />
+		<param name="min_num_kf_in_map" type="int" value="5" />
+	</node>
+</launch>
