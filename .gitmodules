@@ -26,7 +26,3 @@
 	path = realsense-ros
 	url = https://github.com/IntelRealSense/realsense-ros.git
 
-[submodule "ros_marvelmind_package"]
-	path = ros_marvelmind_package
-	url = https://bitbucket.org/marvelmind_robotics/ros_marvelmind_package.git
-
