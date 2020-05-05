@@ -8,11 +8,14 @@ endif()
 
 set(EXECUTABLE_TARGETS "")
 
-add_executable(run_slam run_slam.cc)
-list(APPEND EXECUTABLE_TARGETS run_slam)
+add_executable(mono_slam mono_slam.cc)
+list(APPEND EXECUTABLE_TARGETS mono_slam)
 
-add_executable(my_impl my_impl.cpp)
-list(APPEND EXECUTABLE_TARGETS my_impl)
+add_executable(stereo_slam stereo_slam.cpp)
+list(APPEND EXECUTABLE_TARGETS stereo_slam)
+
+add_executable(rgbd_slam rgbd_slam.cpp)
+list(APPEND EXECUTABLE_TARGETS rgbd_slam)
 
 add_executable(run_localization run_localization.cc)
 list(APPEND EXECUTABLE_TARGETS run_localization)

@@ -1,17 +1,39 @@
 <launch>
-	
-	<arg name="scan_topic" value="/porter/os1_cloud_node/scan" />
-	
-	<node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="porter_lidar_converter" >
-	<remap from="cloud_in" to="/porter/os1_cloud_node/points" />
-	<remap from="/scan" to="$(arg scan_topic)" />
-	</node>
-	
-	<param name="use_sim_time" value="false"/>
+	<arg name="offline"          default="false"/>
 
-	<node pkg="openvslam" type="run_slam" name="openvslam" args="-v $(find openvslam)/../../config/orb_vocab.dbow2  -c $(find openvslam)/../../config/test.yaml ">
-		<remap from="camera/image_raw" to="right/image_raw" />
-		
-	</node>
+	<group ns="porter">
+
+		<include unless="$(arg offline)"
+			file="$(find realsense2_camera)/launch/rs_camera.launch">
+
+			<arg name="camera"	value="rs_camera"/>
+
+			<arg name="enable_color"        value="true"/>
+			<arg name="enable_fisheye"	value="false"/>
+			<arg name="enable_depth"        value="true"/>
+			<arg name="enable_gyro"         value="true"/>
+			<arg name="enable_accel"        value="true"/>
+			<arg name="enable_infra1"       value="false"/>
+			<arg name="enable_infra2"       value="false"/>
+
+			<arg name="color_width"         default="640"/>
+			<arg name="color_height"        default="480"/>
+			<arg name="depth_width"         default="640"/>
+			<arg name="depth_height"        default="480"/>
+			<arg name="gyro_fps"            value="400"/>
+			<arg name="accel_fps"           value="250"/>
+
+			<arg name="align_depth"	value="true"/>
+			<arg name="linear_accel_cov"	value="1.0"/>
+			<arg name="unite_imu_method"	value="linear_interpolation"/>
+		</include>
+
+
+		<node pkg="openvslam" type="rgbd_slam" name="openvslam" args="-v $(find openvslam)/../../config/orb_vocab.dbow2  -c $(find openvslam)/../../config/rgbd.yaml ">
+
+			
+		</node>
+
+	</group>
 
 </launch> 
