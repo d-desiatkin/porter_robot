@@ -8,6 +8,8 @@ if(POLICY CMP0074)
     cmake_policy(SET CMP0074 OLD)
 endif()
 
+
+
 # digging into the root directory of OpenVSLAM
 get_filename_component(DEFAULT_OpenVSLAM_DIR ${PROJECT_SOURCE_DIR} DIRECTORY)
 get_filename_component(DEFAULT_OpenVSLAM_DIR ${DEFAULT_OpenVSLAM_DIR} DIRECTORY)
@@ -128,7 +130,9 @@ endif()
 
 find_package(catkin REQUIRED COMPONENTS
         cv_bridge
-        image_transport)
+        image_transport
+        pcl_conversions
+        pcl_ros)
 
 # thread library
 find_package(Threads REQUIRED)
@@ -192,7 +196,9 @@ endif()
 
 catkin_package(CATKIN_DEPENDS
         cv_bridge
-        image_transport)
+        image_transport
+        pcl_conversions
+        pcl_ros)
 
 #################
 # BoW framework #

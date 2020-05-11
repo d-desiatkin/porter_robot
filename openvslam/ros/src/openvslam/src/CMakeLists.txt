@@ -20,6 +20,9 @@ list(APPEND EXECUTABLE_TARGETS rgbd_slam)
 add_executable(run_localization run_localization.cc)
 list(APPEND EXECUTABLE_TARGETS run_localization)
 
+add_executable(rgbd rgbd_slam_ac.cpp)
+list(APPEND EXECUTABLE_TARGETS rgbd)
+
 foreach(EXECUTABLE_TARGET IN LISTS EXECUTABLE_TARGETS)
     add_dependencies(${EXECUTABLE_TARGET} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 

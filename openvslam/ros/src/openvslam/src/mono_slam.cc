@@ -37,7 +37,6 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg, const std::str
     openvslam::system SLAM(cfg, vocab_file_path);
     // startup the SLAM process
     SLAM.startup();
-
     // create a viewer object
     // and pass the frame_publisher and the map_publisher
 #ifdef USE_PANGOLIN_VIEWER
@@ -66,6 +65,7 @@ void mono_tracking(const std::shared_ptr<openvslam::config>& cfg, const std::str
         const auto track_time = std::chrono::duration_cast<std::chrono::duration<double>>(tp_2 - tp_1).count();
         track_times.push_back(track_time);
     });
+	//SLAM.enable_mapping_module();
 
     // run the viewer in another thread
 #ifdef USE_PANGOLIN_VIEWER

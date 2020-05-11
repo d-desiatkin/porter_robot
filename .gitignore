@@ -1,3 +1,4 @@
 .vscode/
 .idea/
 openvslam/ros/src/openvslam/cmake-build-debug
+openvslam/build

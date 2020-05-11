@@ -11,7 +11,7 @@
 			<arg name="enable_color"        value="true"/>
 			<arg name="enable_fisheye"	value="false"/>
 			<arg name="enable_depth"        value="true"/>
-			<arg name="enable_gyro"         value="true"/>
+			<arg name="enable_gyro"         value="false"/>
 			<arg name="enable_accel"        value="true"/>
 			<arg name="enable_infra1"       value="false"/>
 			<arg name="enable_infra2"       value="false"/>
@@ -22,15 +22,19 @@
 			<arg name="depth_height"        default="480"/>
 			<arg name="gyro_fps"            value="400"/>
 			<arg name="accel_fps"           value="250"/>
-
+			
+			<arg name="filters"	value=""/>
+			<arg name="enable_sync"	value="true"/>
 			<arg name="align_depth"	value="true"/>
 			<arg name="linear_accel_cov"	value="1.0"/>
 			<arg name="unite_imu_method"	value="linear_interpolation"/>
 		</include>
 
-
-		<node pkg="openvslam" type="rgbd_slam" name="openvslam" args="-v $(find openvslam)/../../config/orb_vocab.dbow2  -c $(find openvslam)/../../config/rgbd.yaml ">
-
+		<node pkg="openvslam" type="rgbd" name="openvslam" launch-prefix='' 
+			args="-v $(find openvslam)/../../config/orb_vocab.dbow2  -c $(find openvslam)/../../config/rgbd.yaml 
+			-p $(find porter_map)/openvslam/garage.msg">
+			<remap from="color/image_raw" to="rs_camera/color/image_raw" />
+			<remap from="depth/image_raw" to="rs_camera/aligned_depth_to_color/image_raw" />
 			
 		</node>
 

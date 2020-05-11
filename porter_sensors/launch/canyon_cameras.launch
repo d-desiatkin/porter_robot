@@ -36,11 +36,11 @@
 		<param name="cv_cap_prop_convert_rgb" value="1" />
 	</node>
 	
-	<node pkg="image_proc" type="image_proc" name="image_proc" launch-prefix="nice -n -20">
+	<!-- <node pkg="image_proc" type="image_proc" name="image_proc" launch-prefix="nice -n -20">
 		<remap from="/image_raw" to="/left/image_raw"/>
 		<remap from="/camera_info" to="/left/camera_info"/>
 		
-	</node>
+	</node> -->
 
 
 </launch>
