@@ -2,23 +2,28 @@ local_costmap:
   global_frame: odom
   robot_base_frame: chasiss
   update_frequency: 5.0
-  publish_frequency: 2.0
+  publish_frequency: 5.0
   static_map: false
   rolling_window: true
-  width: 6.0
-  height: 6.0
-  resolution: 0.05
+  width: 4.0
+  height: 4.0
+  resolution: 0.02
+  observation_sources: ouster_os1_64 # realsense_435i
+#  realsense_435i: {
+#    sensor_frame: rs_camera_link,
+#    data_type: PointCloud2, 
+#    topic: rtabmap/odom_last_frame, 
+#    expected_update_rate: 5, 
+#    marking: true, 
+#    clearing: true}
 
-  observation_sources: point_cloud_sensor
-
-  point_cloud_sensor: {
-    sensor_frame: rs_camera_link,
+  ouster_os1_64: {
+    sensor_frame: os1_sensor,
     data_type: PointCloud2, 
-    topic: planner_cloud, 
-    expected_update_rate: 0.5, 
+    topic: os1_cloud_node/points, 
+    expected_update_rate: 10, 
     marking: true, 
-    clearing: true,
-    min_obstacle_height: -99999.0,
-    max_obstacle_height: 99999.0}
+    clearing: true}
+
 
 

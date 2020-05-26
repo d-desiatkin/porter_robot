@@ -20,8 +20,8 @@
 			<arg name="color_height"        default="480"/>
 			<arg name="depth_width"         default="640"/>
 			<arg name="depth_height"        default="480"/>
-			<arg name="gyro_fps"            value="400"/>
-			<arg name="accel_fps"           value="250"/>
+			<arg name="gyro_fps"            value="200"/>
+			<arg name="accel_fps"           value="63"/>
 			
 			<arg name="filters"	value=""/>
 			<arg name="enable_sync"	value="true"/>
@@ -30,13 +30,28 @@
 			<arg name="unite_imu_method"	value="linear_interpolation"/>
 		</include>
 
-		<node pkg="openvslam" type="rgbd" name="openvslam" launch-prefix='' 
-			args="-v $(find openvslam)/../../config/orb_vocab.dbow2  -c $(find openvslam)/../../config/rgbd.yaml 
-			-p $(find porter_map)/openvslam/garage.msg">
-			<remap from="color/image_raw" to="rs_camera/color/image_raw" />
-			<remap from="depth/image_raw" to="rs_camera/aligned_depth_to_color/image_raw" />
+		<group ns="openvslam">
+			<node pkg="openvslam" type="rgbd" name="openvslam" launch-prefix='' 
+				args="-v $(find openvslam)/../../config/orb_vocab.dbow2  -c $(find openvslam)/../../config/rgbd.yaml 
+				-p $(find porter_map)/openvslam/garage.msg">
+				<remap from="color/image_raw" to="/porter/rs_camera/color/image_raw" />
+				<remap from="depth/image_raw" to="/porter/rs_camera/aligned_depth_to_color/image_raw" />
+				
+			</node>
 			
-		</node>
+			<node pkg="octomap_server" type="octomap_server_node" name="octomap_map_proj">
+
+				<param name="resolution" value="0.05" />
+				
+				<param name="frame_id" type="string" value="map" />
+				
+				<param name="sensor_model/max_range" value="10.0" />
+				
+				<remap from="cloud_in" to="map_cloud" />
+
+			</node>
+			
+		</group>
 
 	</group>
 

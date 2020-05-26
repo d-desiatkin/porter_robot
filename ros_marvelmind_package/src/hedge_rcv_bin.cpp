@@ -64,7 +64,7 @@ static int hedgeReceivePrepare(int argc, char **argv)
         return -1;
     }
     hedge->ttyFileName=ttyFileName;
-    hedge->baudRate=500000;
+    hedge->baudRate=115200;
     hedge->verbose=true; // show errors and warnings
     hedge->anyInputPacketCallback= semCallback;
     startMarvelmindHedge (hedge);
@@ -291,6 +291,7 @@ int main(int argc, char **argv)
 	  
     if (hedgeReceiveCheck())
      {// hedgehog data received
+		ROS_INFO_ONCE("Hedgehog data recieved");
 		//ROS_INFO("Address: %d, timestamp: %d, %d, X=%.3f  Y= %.3f  Z=%.3f  Angle: %.1f  flags=%d", 	
 		//		(int) hedge_pos_ang_msg.address,
 		//		(int) hedge_pos_ang_msg.timestamp_ms, 
@@ -308,6 +309,7 @@ int main(int argc, char **argv)
     beaconReadIterations= 0; 
     while(beaconReceiveCheck())
      {// stationary beacons data received
+	ROS_INFO_ONCE("Beacons data recieved");
 	//	ROS_INFO("Stationary beacon: Address: %d, X=%.3f  Y= %.3f  Z=%.3f", 	
 	//			(int) beacon_pos_msg.address,
 	//			(float) beacon_pos_msg.x_m, (float) beacon_pos_msg.y_m, (float) beacon_pos_msg.z_m);

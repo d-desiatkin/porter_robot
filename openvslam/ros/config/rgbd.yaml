@@ -2,7 +2,7 @@
 # Camera Model #
 #==============#
 
-Camera.name: "rs_camera_link"
+Camera.name: "rs_camera"
 Camera.setup: "RGBD"
 Camera.model: "perspective"
 

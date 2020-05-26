@@ -1,0 +1,21 @@
+<launch>
+
+
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+		<param name="publish_frequency" type="double" value="50.0" />
+	</node>
+
+
+	<node pkg="porter_robot" type="odrive_node_UART.py" name="odrive" output="screen" respawn="false">
+		<param name="wheel_track" 		     value="0.88"/>
+		<param name="tyre_circumference" 	     value="0.79796453401"/>
+		<param name="wheel_radius" 		     value="0.127"/>
+		<param name="base_frame"		     value="chasiss"/>
+		<param name="odom_frame"		     value="odom"/>
+		<param name="odom_calc_hz"		     value="20.0" />
+		<param name="publish_odom_tf"		     value="$(arg publish_odom_tf)" />
+	</node>
+	    		
+
+
+</launch>
