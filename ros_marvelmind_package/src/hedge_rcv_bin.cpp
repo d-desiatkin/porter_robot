@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <nav_msgs/Odometry.h>
 #include "marvelmind_nav/hedge_pos.h"
 #include "marvelmind_nav/hedge_pos_a.h"
 #include "marvelmind_nav/hedge_pos_ang.h"
@@ -38,6 +39,7 @@ marvelmind_nav::beacon_pos_a beacon_pos_msg;// stationary beacon coordinates mes
 marvelmind_nav::hedge_imu_raw hedge_imu_raw_msg;// raw IMU data message for publishing to ROS topic
 marvelmind_nav::hedge_imu_fusion hedge_imu_fusion_msg;// IMU fusion data message for publishing to ROS topic
 marvelmind_nav::beacon_distance beacon_raw_distance_msg;// Raw distance message for publishing to ROS topic
+nav_msgs::Odometry odom_msg;
 
 static sem_t *sem;
 struct timespec ts;
@@ -86,19 +88,28 @@ static bool hedgeReceiveCheck(void)
         if (hedge_pos_msg.flags&(1<<1))// flag of timestamp format 
           {
 			hedge_pos_msg.timestamp_ms= position.timestamp;// msec
+			odom_msg.header.stamp.sec = hedge_pos_msg.timestamp_ms / 1000;
+			odom_msg.header.stamp.nsec = hedge_pos_msg.timestamp_ms % 1000 * 1000000;
 			hedge_pos_noaddress_msg.timestamp_ms= position.timestamp;
 		  }	
 	     else 
 	      {
             hedge_pos_msg.timestamp_ms= position.timestamp*15.625;// alpha-cycles ==> msec
+            odom_msg.header.stamp.sec = hedge_pos_msg.timestamp_ms / 1000;
+            odom_msg.header.stamp.nsec = hedge_pos_msg.timestamp_ms % 1000 * 1000000;
             hedge_pos_noaddress_msg.timestamp_ms= position.timestamp*15.625;
           } 
         hedge_pos_ang_msg.timestamp_ms= position.timestamp;
           
         hedge_pos_msg.x_m= position.x/1000.0; 
         hedge_pos_msg.y_m= position.y/1000.0; 
-        hedge_pos_msg.z_m= position.z/1000.0; 
-        
+        hedge_pos_msg.z_m= position.z/1000.0;
+
+        // Here I add the odometry msg.
+        odom_msg.pose.pose.position.x = hedge_pos_msg.x_m;
+        odom_msg.pose.pose.position.y = hedge_pos_msg.y_m;
+        odom_msg.pose.pose.position.z = hedge_pos_msg.z_m;
+
         hedge_pos_noaddress_msg.x_m= position.x/1000.0; 
         hedge_pos_noaddress_msg.y_m= position.y/1000.0; 
         hedge_pos_noaddress_msg.z_m= position.z/1000.0;
@@ -242,6 +253,8 @@ int main(int argc, char **argv)
   
   ros::Publisher beacon_distance_publisher = n.advertise<marvelmind_nav::beacon_distance>(BEACON_RAW_DISTANCE_TOPIC_NAME, 1000);
 
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 1000);
+  odom_msg.header.frame_id = "marvelmind_odom";
 
   // 200 Hz 
   ros::Rate loop_rate(200);
@@ -301,6 +314,7 @@ int main(int argc, char **argv)
 		//		(int) hedge_pos_msg.flags);
 		hedge_pos_ang_publisher.publish(hedge_pos_ang_msg);
         hedge_pos_publisher.publish(hedge_pos_msg);
+        odom_pub.publish(odom_msg);
         hedge_pos_noaddress_publisher.publish(hedge_pos_noaddress_msg);
         
         hedge_timestamp_prev= hedge_pos_ang_msg.timestamp_ms;
