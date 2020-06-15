@@ -1,21 +1,22 @@
 <launch>
 
 
-	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
-		<param name="publish_frequency" type="double" value="50.0" />
-	</node>
+		<arg name="record_cameras" default="false" />
+		<arg name="record_position" default="true" />
+		<arg name="record_diagnostics" default="false" />
+		<arg name="exp_name" default="data" />
 
+		<node pkg="rosbag" type="record" name="rosbag_record_cam"
+		args="record -o /tmp/$(arg exp_name)_cams /porter/rs_camera/aligned_depth_to_color/image_raw /porter/rs_camera/color/image_raw /porter/rs_camera/aligned_depth_to_color/camera_info /porter/rs_camera/color/camera_info"
+		if="$(arg record_cameras)" />
 
-	<node pkg="porter_robot" type="odrive_node_UART.py" name="odrive" output="screen" respawn="false">
-		<param name="wheel_track" 		     value="0.88"/>
-		<param name="tyre_circumference" 	     value="0.79796453401"/>
-		<param name="wheel_radius" 		     value="0.127"/>
-		<param name="base_frame"		     value="chasiss"/>
-		<param name="odom_frame"		     value="odom"/>
-		<param name="odom_calc_hz"		     value="20.0" />
-		<param name="publish_odom_tf"		     value="$(arg publish_odom_tf)" />
-	</node>
-	    		
+		<node pkg="rosbag" type="record" name="rosbag_record_hrpsys"
+		args="record -o /tmp/$(arg exp_name)_pos /porter/rtabmap/odom /tf /hedge_pos /porter/openvslam/rgbd_odom /porter/orb_slam2_rgbd/pose"
+		if="$(arg record_position)" />
+
+		<node pkg="rosbag" type="record" name="rosbag_record_diag"
+		args="record -o /tmp/$(arg exp_name)_diag /diagnostics /rosout"
+		if="$(arg record_diagnostics)"/>   
 
 
 </launch>
