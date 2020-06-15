@@ -75,7 +75,7 @@ void calculate_odometry(tf2_ros::Buffer* tf_buf, tf2_ros::TransformBroadcaster* 
     if(process_odom){
         auto cam_pose_ = OVS_map->get_current_cam_pose();
         // To right coordinates
-        cam_pose_ = cam_pose_.inverse().eval();
+        // cam_pose_ = cam_pose_.inverse().eval();
 
         // Extract rotation matrix and translation vector from
         Eigen::Matrix3d rotation_matrix = cam_pose_.block(0, 0, 3, 3);
@@ -90,9 +90,9 @@ void calculate_odometry(tf2_ros::Buffer* tf_buf, tf2_ros::TransformBroadcaster* 
 
         tf2::Vector3 tf_camera_translation(translation_vector(0), translation_vector(1), translation_vector(2));
 
-        const tf2::Matrix3x3 tf_opt_to_ros( 0, 0, 1,
-                                        -1, 0, 0,
-                                            0,-1, 0);
+        const tf2::Matrix3x3 tf_opt_to_ros(0, 0, 1,
+                                          -1, 0, 0,
+                                           0,-1, 0);
 
         //Transform from camera coordinate system to ros coordinate system on camera coordinates
         tf_camera_rotation = tf_opt_to_ros*tf_camera_rotation;
@@ -116,8 +116,8 @@ void calculate_odometry(tf2_ros::Buffer* tf_buf, tf2_ros::TransformBroadcaster* 
             offset_elim = cam_to_bl.transform.translation.z;
             tf2::Stamped<tf2::Transform> cam_to_bl_tf;
             tf2::fromMsg(cam_to_bl, cam_to_bl_tf);
-            transform_tf = transform_tf*cam_to_bl_tf;
-            transform_tf = transform_tf.inverse();
+            transform_tf = transform_tf*cam_to_bl_tf.inverse();
+            transform_tf = transform_tf;
 
             odom_tf->child_frame_id = "chasiss";
             odom_msg_->child_frame_id = "chasiss";
@@ -128,8 +128,8 @@ void calculate_odometry(tf2_ros::Buffer* tf_buf, tf2_ros::TransformBroadcaster* 
             offset_elim = cam_to_bl.transform.translation.z;
             tf2::Stamped<tf2::Transform> cam_to_bl_tf;
             tf2::fromMsg(cam_to_bl, cam_to_bl_tf);
-            transform_tf = transform_tf*cam_to_bl_tf;
-            transform_tf = transform_tf.inverse();
+            transform_tf = transform_tf*cam_to_bl_tf.inverse();
+            transform_tf = transform_tf;
 
             odom_tf->child_frame_id = "rs_camera_link";
             odom_msg_->child_frame_id = "rs_camera_link";
@@ -214,7 +214,7 @@ void convert_map(ros::Publisher* map_publisher, ros::Publisher* local_map_publis
                 pcl::PointXYZ newPoint;
                 newPoint.x = pos_w.z();
                 newPoint.y = -pos_w.x();
-                newPoint.z = -pos_w.y();
+                newPoint.z = -pos_w.y() + cam_to_bl.transform.translation.z + 0.175;
                 local_map_cloud_msg->points.push_back(newPoint);
             }
             
@@ -275,7 +275,7 @@ void rgbd_tracking(const std::shared_ptr<openvslam::config>& cfg, const std::str
     OVS_map = SLAM->get_map_publisher();
 
     map_cloud_msg->header.frame_id = "map";
-    local_map_cloud_msg->header.frame_id = "rs_camera_aligned_depth_to_color_frame";
+    local_map_cloud_msg->header.frame_id = "map";
 
     map_tf->header.frame_id = "map";
     map_tf->child_frame_id = "odom";

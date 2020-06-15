@@ -46,6 +46,7 @@
 				<param name="frame_id" type="string" value="map" />
 				
 				<param name="sensor_model/max_range" value="10.0" />
+				<param name="pointcloud_min_z" value="0.13" />
 				
 				<remap from="cloud_in" to="map_cloud" />
 
