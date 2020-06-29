@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot name="mti-g-710">
+
+	<link name="xsens_imu_link">
+		<visual>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<geometry>
+				<mesh filename="package://porter_robot_model/meshes/MTi_6xx.stl" scale="0.001 0.001 0.001"/>
+			</geometry>
+			<material name="xsens_orange">
+				<color rgba="0.92 0.45 0.02 1.0"/>
+			</material>
+		</visual>
+	</link>
+
+	<joint name="xsense_imu_joint" type="fixed">
+		<axis xyz="0 0 0" />
+		<origin rpy="0 0 0" xyz="0 0 ${base_thickness/2 + 0.0016}"/>
+		<parent link="chasiss"/>
+		<child link="xsens_imu_link"/>
+	</joint>
+
+</robot>

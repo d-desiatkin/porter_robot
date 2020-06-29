@@ -6,6 +6,7 @@
 	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/camera_main.xacro"/>
 	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/OS1-64.urdf.xacro"/>
 	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/rs_camera.xacro"/>
+	<xacro:include filename="$(find porter_robot_model)/xacro/sensors/MTi_6xx.xacro"/>
 
 	<!-- Here actual model begins -->
 	<link name="${base_name}">

@@ -1,0 +1,5 @@
+global_costmap:
+  global_frame: map
+  robot_base_frame: chasiss
+  update_frequency: 1
+  static_map: true

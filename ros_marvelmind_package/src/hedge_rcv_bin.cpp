@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include "ros/ros.h"
 #include "std_msgs/String.h"
+#include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
 #include "marvelmind_nav/hedge_pos.h"
 #include "marvelmind_nav/hedge_pos_a.h"
@@ -28,6 +29,7 @@ extern "C"
 #define HEDGE_IMU_RAW_TOPIC_NAME "/hedge_imu_raw"
 #define HEDGE_IMU_FUSION_TOPIC_NAME "/hedge_imu_fusion"
 #define BEACON_RAW_DISTANCE_TOPIC_NAME "/beacon_raw_distance"
+#define M_PI 3.14159265358979323846
 
 struct MarvelmindHedge * hedge= NULL;
 
@@ -119,6 +121,9 @@ static bool hedgeReceiveCheck(void)
         hedge_pos_ang_msg.z_m= position.z/1000.0;
         
         hedge_pos_ang_msg.angle= position.angle;
+        // Here angle
+        geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(position.angle * M_PI / 180);
+        odom_msg.pose.pose.orientation = odom_quat;
         
         hedge->haveNewValues_=false;
         
@@ -253,7 +258,7 @@ int main(int argc, char **argv)
   
   ros::Publisher beacon_distance_publisher = n.advertise<marvelmind_nav::beacon_distance>(BEACON_RAW_DISTANCE_TOPIC_NAME, 1000);
 
-  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 1000);
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("marvelmind_odom", 1000);
   odom_msg.header.frame_id = "marvelmind_odom";
 
   // 200 Hz 
