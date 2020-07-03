@@ -10,3 +10,8 @@ The goals were following:
 
 [![OpenVSLAM floating points problem](https://github.com/d-desiatkin/porter_robot/blob/master/docs/Start_mapping.gif)](https://www.youtube.com/watch?v=lYqDmJWyFwA)
 [![OpenVSLAM floating points problem](https://github.com/d-desiatkin/porter_robot/blob/master/docs/End_mapping.gif)](https://www.youtube.com/watch?v=lYqDmJWyFwA)
+
+
+# Problems with floating points in OpenVSLAM:
+[![OpenVSLAM floating points problem](https://github.com/d-desiatkin/porter_robot/blob/master/docs/Pointcloud.gif)](https://www.youtube.com/watch?v=lYqDmJWyFwA)
+
