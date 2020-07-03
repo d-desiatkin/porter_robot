@@ -7,4 +7,4 @@ The goals were following:
 2. Compare the visual Simultaneous Localisation and Mapping (SLAM) algorithms.
 
 Here you may find the example of live performance:
-[![Demo CountPages alpha](https://share.gifyoutube.com/KzB6Gb.gif)](https://www.youtube.com/watch?v=ek1j272iAmc)
+![OpenVSLAM floating points problem](https://github.com/d-desiatkin/porter_robot/blob/master/docs/Start_mapping.gif)](https://www.youtube.com/watch?v=lYqDmJWyFwA)
